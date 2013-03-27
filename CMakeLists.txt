@@ -39,7 +39,7 @@ QT4_WRAP_CPP(qt_HEADERS_MOC ${qt_HEADERS})
 qt4_automoc(${qt_SOURCES})
 
 #uncomment if you have defined messages
-rosbuild_genmsg()
+#rosbuild_genmsg()
 #uncomment if you have defined services
 #rosbuild_gensrv()
 

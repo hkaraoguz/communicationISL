@@ -1,5 +1,4 @@
 #include "robot.h"
-#include "communicationISL/neighborInfo.h"
 #include "communicationmanager.h"
 #include "rosThread.h"
 
@@ -91,7 +90,7 @@ void Robot::receiveRobotInfo(navigationISL::robotInfo info)
 {
     this->info = info;
 
-    communicationISL::neighborInfo ninfo;
+    navigationISL::neighborInfo ninfo;
 
     ninfo.name = this->name.toStdString();
 

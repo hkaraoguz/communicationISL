@@ -3,6 +3,7 @@
 
 #include <QObject>
 #include <navigationISL/robotInfo.h>
+#include <navigationISL/neighborInfo.h>
 #include <QString>
 #include "Client.h"
 

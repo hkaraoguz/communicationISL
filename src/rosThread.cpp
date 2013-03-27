@@ -1,5 +1,5 @@
 #include "rosThread.h"
-#include "communicationISL/neighborInfo.h"
+#include <navigationISL/neighborInfo.h>
 
 RosThread::RosThread()
 {
@@ -32,7 +32,7 @@ void RosThread::work(){
 
      robotInfoSubscriber = n.subscribe("navigationISL/robotInfo",1,&CommunicationManager::handleNavigationISLInfo,this->manager);
 
-     neighborInfoPublisher = n.advertise<communicationISL::neighborInfo>("communicationISL/neighborInfo",1);
+     neighborInfoPublisher = n.advertise<navigationISL::neighborInfo>("communicationISL/neighborInfo",1);
   //  this->amclSub = n.subscribe("amcl_pose",2,&RosThread::amclPoseCallback,this);
 
      ros::AsyncSpinner spinner(2);

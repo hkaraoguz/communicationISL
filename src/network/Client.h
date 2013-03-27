@@ -5,7 +5,7 @@
 #include <QtNetwork>
 #include <QtCore/QByteArray>
 #include <navigationISL/robotInfo.h>
-#include "communicationISL/neighborInfo.h"
+#include "navigationISL/neighborInfo.h"
 #define INCOMING_CLIENT 0
 #define OUTGOING_CLIENT 1
 class tcpComm;
