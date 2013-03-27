@@ -9,7 +9,10 @@ CommunicationManager::CommunicationManager(QObject *parent) :
 {
    // robots.resize(1);
 
-    this->initializeNetwork();
+    if(!this->initializeNetwork())
+    {
+        qDebug()<<"Initialization failed";
+    }
 
   //  Robot* robot = new Robot(this);
 
@@ -319,7 +322,9 @@ bool CommunicationManager::initializeNetwork()
 {
 
     // Read config file
-    if(!this->readConfigFile("../../configISL.json")) return false;
+    QString path = QDir::homePath();
+    path.append("/fuerte_workspace/sandbox/configISL.json");
+    if(!this->readConfigFile(path)) return false;
 
     // Setup TCP server
     this->TcpComm = new tcpComm(this);

@@ -23,6 +23,10 @@ int main(int argc,char** argv){
 
     rosthread->moveToThread(&thr);
 
+    QObject::connect(rosthread,SIGNAL(rosFinished()),&thr,SLOT(quit()));
+
+    QObject::connect(&thr,SIGNAL(finished()),&app,SLOT(quit()));
+
     QObject::connect(&thr,SIGNAL(finished()),rosthread,SLOT(deleteLater()));
 
     QObject::connect(&thr,SIGNAL(started()),rosthread,SLOT(work()));

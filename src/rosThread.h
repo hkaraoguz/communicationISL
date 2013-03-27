@@ -45,7 +45,7 @@ public slots:
      void work();
 
 signals:
-
+   void rosFinished();
    void  rosStarted();
    void  rosStartFailed();
 

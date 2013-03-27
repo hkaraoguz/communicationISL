@@ -53,6 +53,8 @@ void RosThread::work(){
 
     }
 
+    emit rosFinished();
+
 
 }
 void RosThread::shutdownROS()
