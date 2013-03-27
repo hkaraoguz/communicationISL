@@ -32,8 +32,11 @@ void RosThread::work(){
 
      robotInfoSubscriber = n.subscribe("navigationISL/robotInfo",1,&CommunicationManager::handleNavigationISLInfo,this->manager);
 
+     coordinatorUpdateSubscriber = n.subscribe("navigationISL/coordinatorUpdate",1,&CommunicationManager::handleCoordinatorUpdate,this->manager);
+
      neighborInfoPublisher = n.advertise<navigationISL::neighborInfo>("communicationISL/neighborInfo",1);
   //  this->amclSub = n.subscribe("amcl_pose",2,&RosThread::amclPoseCallback,this);
+
 
      ros::AsyncSpinner spinner(2);
 

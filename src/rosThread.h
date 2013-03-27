@@ -40,6 +40,8 @@ private:
 
      ros::Publisher neighborInfoPublisher;
 
+     ros::Subscriber coordinatorUpdateSubscriber;
+
 
 public slots:
      void work();

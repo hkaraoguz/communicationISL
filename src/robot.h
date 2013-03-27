@@ -16,6 +16,8 @@ public:
 
     void setRobotInfo(navigationISL::robotInfo info);
 
+    void sendCoordinatorUpdate(navigationISL::robotInfo info);
+
     navigationISL::robotInfo getRobotInfo();
 
     void setName(QString nam);
@@ -65,7 +67,10 @@ signals:
     
 public slots:
     void getClientDisconnected(int type);
-    void receiveRobotInfo(navigationISL::robotInfo);
+
+    void receiveRobotInfo(navigationISL::robotInfo info);
+
+    void receiveCoordinatorUpdate(navigationISL::robotInfo info);
 
 
     

@@ -1,13 +1,12 @@
-#include <ros/ros.h>
-
-#include <QApplication>
-
 #include "communicationmanager.h"
-
 #include "rosThread.h"
 
 #include <QThread>
-int main(int argc,char** argv){
+#include <ros/ros.h>
+#include <QApplication>
+
+int main(int argc,char** argv)
+{
 
     ros::init(argc,argv,"communicationISL");
 

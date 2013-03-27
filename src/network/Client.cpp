@@ -50,6 +50,8 @@ Client::Client(QTcpSocket* sock, int clientType, QObject* parent):QObject(parent
     //connect(this,SIGNAL(imageReceived(QImage)), TcpComm, SLOT(getClientImageReceived(QImage)));
     connect(this,SIGNAL(neighborInfo(navigationISL::robotInfo)),this->parent(),SLOT(receiveRobotInfo(navigationISL::robotInfo)));
 
+    connect(this,SIGNAL(coordinatorUpdate(navigationISL::robotInfo)),this->parent(),SLOT(receiveCoordinatorUpdate(navigationISL::robotInfo)));
+
     messageDataSizeBuf = new char[50];
 	
 	messageBuf = new char[50];
@@ -85,11 +87,11 @@ Client::Client(int clientType, QObject* parent):QObject(parent)
 
     //hostName = TcpComm->getHostName();
 
-    connect(this, SIGNAL(sendClientInfo(QList<QString>,int)), this->parent(), SLOT(getClientInfo(QList<QString>,int)));
+    //connect(this, SIGNAL(sendClientInfo(QList<QString>,int)), this->parent(), SLOT(getClientInfo(QList<QString>,int)));
 
     connect(this, SIGNAL(clientDisconnected(int)),this->parent(), SLOT(getClientDisconnected(int)));
 
-	connect(socket, SIGNAL(disconnected()), this, SLOT(getSocketDisconnected()));
+    connect(socket, SIGNAL(disconnected()), this, SLOT(getSocketDisconnected()));
 
 	connect(socket,SIGNAL(readyRead()),this,SLOT(receiveData()));
 
@@ -443,6 +445,44 @@ void Client::receiveRobotInfo()
 
 
 }
+void Client::sendCoordinatorUpdate(navigationISL::robotInfo info)
+{
+    QByteArray data;
+
+    QString temp = QString::number(info.posX);
+
+    data.append(temp);
+
+    data.append(";");
+
+    temp = QString::number(info.posY);
+
+    data.append(temp);
+
+    int dataSize = data.size();
+
+    QByteArray dat = makeDataPackage(RECV_COORDINATOR_UPDATE,dataSize,data);
+
+    sendData(dat);
+
+}
+void Client::receiveCoordinatorUpdate()
+{
+    navigationISL::robotInfo robotInfo;
+
+    QStringList result = myRecData.split(";");
+
+    if(result.size() > 1)
+    {
+        robotInfo.posX = result.at(0).toFloat();
+
+        robotInfo.posY = result.at(1).toFloat();
+
+
+    }
+
+
+}
 void Client::setClientIP(QString ip){
 
 	IP = ip;
@@ -543,6 +583,9 @@ void Client::handleTask(int task , int dataSize){
 		break;
     case RECV_ROBOT_INFO:
         receiveRobotInfo();
+        break;
+    case RECV_COORDINATOR_UPDATE:
+        receiveCoordinatorUpdate();
         break;
 	default:
 		break;

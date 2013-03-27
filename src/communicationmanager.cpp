@@ -151,7 +151,7 @@ void CommunicationManager::connecttt(){
 }
 void CommunicationManager::connectToHost(QString hostAddress, quint16 port)
 {
-    tempClient = new Client(OUTGOING_CLIENT,this->TcpComm);
+    tempClient = new Client(OUTGOING_CLIENT,this);
 
     //this->tempSocket = new QTcpSocket(this);
 
@@ -168,9 +168,9 @@ void CommunicationManager::connectToHost(QString hostAddress, quint16 port)
 
         for(int i = 0; i < robots.size() ; i++){
 
-            qDebug()<<robots[i]->getIP();
+          //  qDebug()<<robots[i]->getIP();
 
-            qDebug()<<tempClient->getClientIP();
+          //  qDebug()<<tempClient->getClientIP();
 
             if(robots[i]->getIP() == tempClient->getClientIP())
             {
@@ -188,17 +188,20 @@ void CommunicationManager::connectToHost(QString hostAddress, quint16 port)
     else
     {
 
+
         qDebug()<<"Error";
 
         for(int i = 0; i < robots.size() ; i++){
 
-            if(robots[i]->getIP() == tempClient->socket->peerAddress().toString())
+            if(robots[i]->getIP() == tempClient->getClientIP())
             {
 
                 robots[i]->setOutGoingConnected(false);
 
             }
         }
+
+        tempClient=0;
 
 
     }
@@ -261,13 +264,45 @@ void CommunicationManager::handleSocketError(QAbstractSocket::SocketError error)
 
     for(int i = 0; i < robots.size() ; i++){
 
-        if(robots[i]->getIP() == tempClient->socket->peerAddress().toString())
+        if(robots[i]->getIP() == tempClient->getClientIP())
         {
 
             robots[i]->setOutGoingConnected(false);
+            break;
 
         }
     }
+
+}
+void CommunicationManager::getClientDisconnected(int type)
+{
+    qDebug()<<"Error client disconnected";
+    for(int i = 0; i < robots.size() ; i++){
+
+        if(robots[i]->getIP() == tempClient->getClientIP())
+        {
+
+            robots[i]->setOutGoingConnected(false);
+            break;
+
+        }
+    }
+
+}
+void CommunicationManager::handleCoordinatorUpdate(navigationISL::robotInfo info)
+{
+    for(int i = 0; i < robots.size(); i++)
+    {
+
+        if(robots[i]->isCoordinator())
+        {
+
+            robots[i]->sendCoordinatorUpdate(info);
+
+            break;
+        }
+    }
+
 
 }
 void CommunicationManager::handleNavigationISLInfo(navigationISL::robotInfo msg)

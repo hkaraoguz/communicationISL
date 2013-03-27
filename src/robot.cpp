@@ -75,6 +75,7 @@ void Robot::setCoordinator(bool status)
 }
 void Robot::getClientDisconnected(int type)
 {
+    qDebug()<<"Robot "<<this->name<<" client "<<type<<" disconncted";
     if(type == INCOMING_CLIENT)
     {
         this->incomingConnected = false;
@@ -103,5 +104,18 @@ void Robot::receiveRobotInfo(navigationISL::robotInfo info)
     CommunicationManager* manager = (CommunicationManager*)this->parent();
 
     manager->rosthread->neighborInfoPublisher.publish(ninfo);
+
+}
+void Robot::receiveCoordinatorUpdate(navigationISL::robotInfo info)
+{
+
+
+}
+void Robot::sendCoordinatorUpdate(navigationISL::robotInfo info)
+{
+
+    this->outgoingclient->sendCoordinatorUpdate(info);
+
+
 
 }

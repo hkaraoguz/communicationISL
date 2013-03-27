@@ -22,6 +22,8 @@ public:
     // Handle messages from Navigation ISL
     void handleNavigationISLInfo(navigationISL::robotInfo msg);
 
+    void handleCoordinatorUpdate(navigationISL::robotInfo info);
+
     bool readConfigFile(QString filename);
 
     bool initializeNetwork();
@@ -57,6 +59,8 @@ private slots:
     void handleSocketError(QAbstractSocket::SocketError error);
     
     void handleNewCommRequest(QTcpSocket* socket);
+
+    void getClientDisconnected(int type);
 };
 
 #endif // COMMUNICATIONMANAGER_H

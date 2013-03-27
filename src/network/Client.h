@@ -52,6 +52,10 @@ public:
 
     void sendRobotInfo(navigationISL::robotInfo info);
 
+    void sendCoordinatorUpdate(navigationISL::robotInfo info);
+
+    void receiveCoordinatorUpdate();
+
     void receiveRobotInfo();
 
 	void receiveSPCounter(bool respond);
@@ -90,7 +94,7 @@ public:
 
         SEND_ROBOT_POSE = 0x12,
 
-        RECV_ROBOT_POSE = 0x13
+        RECV_COORDINATOR_UPDATE = 0x13
 	
 	};
 
@@ -142,5 +146,6 @@ private:
 		void imageReceived(const QImage& image);
 		void acknowledgeReceived(int id);
         void neighborInfo(navigationISL::robotInfo info);
+        void coordinatorUpdate(navigationISL::robotInfo info);
 	
 };
