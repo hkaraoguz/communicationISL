@@ -65,7 +65,7 @@ Client::Client(int clientType, QObject* parent):QObject(parent)
 
 	type = clientType;
 
-    connect(this, SIGNAL(clientDisconnected(int)),this->parent(), SLOT(getClientDisconnected(int)));
+
 
     connect(socket, SIGNAL(disconnected()), this, SLOT(getSocketDisconnected()));
 
@@ -240,6 +240,7 @@ void Client::displaySocketError(QAbstractSocket::SocketError socketError){
 
     qDebug()<<"Socket Error!!!";
 
+    if(type == 0)
     emit(clientDisconnected(type));
 
    // socket->deleteLater();
@@ -421,6 +422,7 @@ void Client::receiveCoordinatorUpdate()
         robotInfo.posY = result.at(1).toFloat();
 
 
+        emit coordinatorUpdate(robotInfo);
     }
 
 

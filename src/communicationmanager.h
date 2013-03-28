@@ -28,6 +28,8 @@ public:
 
     bool initializeNetwork();
 
+
+
     RosThread* rosthread;
 
 private:
@@ -40,7 +42,7 @@ private:
 
     QVector<QString> neighbors;
 
-    QXmlStreamReader* configReader;
+    Robot* myrobot;
 
 
 
@@ -61,6 +63,8 @@ private slots:
     void handleNewCommRequest(QTcpSocket* socket);
 
     void getClientDisconnected(int type);
+
+    void connectToRobots();
 };
 
 #endif // COMMUNICATIONMANAGER_H

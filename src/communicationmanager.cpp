@@ -9,6 +9,7 @@ CommunicationManager::CommunicationManager(QObject *parent) :
 {
    // robots.resize(1);
 
+    myrobot = new Robot(this);
     if(!this->initializeNetwork())
     {
         qDebug()<<"Initialization failed";
@@ -52,6 +53,9 @@ bool CommunicationManager::readConfigFile(QString filename)
        // qDebug()<<result["numrobots"].toString();
 
         int numrobots = result["numrobots"].toInt();
+        int iscoord =   result["iscoordinator"].toInt();
+
+        if(iscoord == 1) myrobot->setCoordinator(true);
 
         this->robots.resize(numrobots);
 
@@ -153,6 +157,8 @@ void CommunicationManager::connectToHost(QString hostAddress, quint16 port)
 {
     tempClient = new Client(OUTGOING_CLIENT,this);
 
+   // connect(tempClient, SIGNAL(clientDisconnected(int)),this, SLOT(getClientDisconnected(int)));
+
     //this->tempSocket = new QTcpSocket(this);
 
    // QObject::connect(tempClient->socket,SIGNAL(connected()),this,SLOT(handleSocketConnect()));
@@ -162,7 +168,6 @@ void CommunicationManager::connectToHost(QString hostAddress, quint16 port)
     tempClient->setIP(hostAddress);
 
     tempClient->socket->connectToHost(hostAddress,port);
-
 
     if(tempClient->socket->waitForConnected(1000)){
 
@@ -174,11 +179,19 @@ void CommunicationManager::connectToHost(QString hostAddress, quint16 port)
 
             if(robots[i]->getIP() == tempClient->getIP())
             {
+                QObject::disconnect(tempClient,SIGNAL(clientDisconnected(int)),this,SLOT(getClientDisconnected(int)));
+
                 tempClient->setParent(robots[i]);
+
+                connect(tempClient, SIGNAL(clientDisconnected(int)),robots[i], SLOT(getClientDisconnected(int)));
 
                 robots[i]->setOutgoingClient(tempClient);
 
                 robots[i]->setOutGoingConnected(true);
+
+                qDebug()<<"Outgoing connected";
+
+                tempClient = 0;
 
                 break;
             }
@@ -188,7 +201,6 @@ void CommunicationManager::connectToHost(QString hostAddress, quint16 port)
     else
     {
 
-
         qDebug()<<"Error";
 
         for(int i = 0; i < robots.size() ; i++){
@@ -197,11 +209,15 @@ void CommunicationManager::connectToHost(QString hostAddress, quint16 port)
             {
 
                 robots[i]->setOutGoingConnected(false);
+                break;
 
             }
         }
 
-        tempClient=0;
+       /* tempClient->socket->deleteLater();
+        tempClient->socket = 0;*/
+        tempClient->deleteLater();
+        tempClient = 0;
 
 
     }
@@ -289,6 +305,7 @@ void CommunicationManager::getClientDisconnected(int type)
     }
 
 }
+// Send the information to the coordinator
 void CommunicationManager::handleCoordinatorUpdate(navigationISL::robotInfo info)
 {
     for(int i = 0; i < robots.size(); i++)
@@ -343,7 +360,15 @@ void CommunicationManager::handleNewCommRequest(QTcpSocket *socket)
 
             robots.at(i)->setIncomingConnected(true);
 
+            if(myrobot->isCoordinator())
+            {
+              //  connect(robots.at(i)->incomingclient,SIGNAL(coordinatorUpdate(navigationISL::robotInfo)), this,SLOT(handleCoordinatorInfo));
+
+            }
+
             qDebug()<<"A new connection";
+
+
 
             return;
         }
@@ -361,13 +386,23 @@ bool CommunicationManager::initializeNetwork()
     path.append("/fuerte_workspace/sandbox/configISL.json");
     if(!this->readConfigFile(path)) return false;
 
-    // Setup TCP server
+    // Initialize TCP server
     this->TcpComm = new tcpComm(this);
 
+    // Start listening incoming connections
     this->TcpComm->myServer->setupServer();
 
     // Direct incoming connections to the slot
     QObject::connect(this->TcpComm->myServer,SIGNAL(newCommRequest(QTcpSocket*)),this,SLOT(handleNewCommRequest(QTcpSocket*)));
+
+    // After 5 seconds start to connect with other robots
+    QTimer::singleShot(5000,this,SLOT(connectToRobots()));
+
+    return true;
+
+}
+void CommunicationManager::connectToRobots()
+{
 
     // Connect to each robot in the list
     for(int i = 0; i < this->robots.size(); i++)
@@ -378,7 +413,7 @@ bool CommunicationManager::initializeNetwork()
 
     }
 
-    return true;
+
 
 }
 

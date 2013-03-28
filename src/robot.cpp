@@ -75,14 +75,17 @@ void Robot::setCoordinator(bool status)
 }
 void Robot::getClientDisconnected(int type)
 {
-    qDebug()<<"Robot "<<this->name<<" client "<<type<<" disconncted";
+    qDebug()<<"Robot "<<this->name<<" client "<<type<<" disconnected"<<"name "<<name;
+
     if(type == INCOMING_CLIENT)
     {
+        //incomingclient->socket->abort();
         this->incomingConnected = false;
         this->incomingclient->deleteLater();
     }
     else
     {
+        //outgoingclient->socket->abort();
         this->outgoingConnected = false;
         this->outgoingclient->deleteLater();
     }

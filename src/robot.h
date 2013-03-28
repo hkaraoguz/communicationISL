@@ -68,8 +68,10 @@ signals:
 public slots:
     void getClientDisconnected(int type);
 
+    // Receive robot info from a neighbor
     void receiveRobotInfo(navigationISL::robotInfo info);
 
+    // Receive a coordinator update info from a robot
     void receiveCoordinatorUpdate(navigationISL::robotInfo info);
 
 
