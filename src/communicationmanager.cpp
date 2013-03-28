@@ -159,7 +159,7 @@ void CommunicationManager::connectToHost(QString hostAddress, quint16 port)
 
    // QObject::connect(tempClient->socket,SIGNAL(error(QAbstractSocket::SocketError)),this,SLOT(handleSocketError(QAbstractSocket::SocketError)));
 
-    tempClient->setClientIP(hostAddress);
+    tempClient->setIP(hostAddress);
 
     tempClient->socket->connectToHost(hostAddress,port);
 
@@ -172,7 +172,7 @@ void CommunicationManager::connectToHost(QString hostAddress, quint16 port)
 
           //  qDebug()<<tempClient->getClientIP();
 
-            if(robots[i]->getIP() == tempClient->getClientIP())
+            if(robots[i]->getIP() == tempClient->getIP())
             {
                 tempClient->setParent(robots[i]);
 
@@ -193,7 +193,7 @@ void CommunicationManager::connectToHost(QString hostAddress, quint16 port)
 
         for(int i = 0; i < robots.size() ; i++){
 
-            if(robots[i]->getIP() == tempClient->getClientIP())
+            if(robots[i]->getIP() == tempClient->getIP())
             {
 
                 robots[i]->setOutGoingConnected(false);
@@ -264,7 +264,7 @@ void CommunicationManager::handleSocketError(QAbstractSocket::SocketError error)
 
     for(int i = 0; i < robots.size() ; i++){
 
-        if(robots[i]->getIP() == tempClient->getClientIP())
+        if(robots[i]->getIP() == tempClient->getIP())
         {
 
             robots[i]->setOutGoingConnected(false);
@@ -279,7 +279,7 @@ void CommunicationManager::getClientDisconnected(int type)
     qDebug()<<"Error client disconnected";
     for(int i = 0; i < robots.size() ; i++){
 
-        if(robots[i]->getIP() == tempClient->getClientIP())
+        if(robots[i]->getIP() == tempClient->getIP())
         {
 
             robots[i]->setOutGoingConnected(false);

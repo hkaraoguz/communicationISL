@@ -14,18 +14,13 @@ int iii = 0;
 	
 Client::Client(QTcpSocket* sock, int clientType, QObject* parent):QObject(parent)
 {
-    //id = clientID; // get ID
 
-//	TcpComm = (tcpComm*)parent; // get Parent class pointer
-
-	//socket = new QTcpSocket(this); // get socket
 
 	socket = sock;
-	socket->setParent(this);
-	
-	//socket->setParent(this);
 
-	socket->setReadBufferSize(0);
+    socket->setParent(this);
+
+    socket->setReadBufferSize(0);
 
 	type = clientType;
 
@@ -33,32 +28,25 @@ Client::Client(QTcpSocket* sock, int clientType, QObject* parent):QObject(parent
 
     IP = socket->peerAddress().toString(); // get IP
 
-	//QHostInfo::lookupHost(IP,this, SLOT(getHostName(QHostInfo)));
-
-   // connect(this, SIGNAL(sendClientInfo(QList<QString>, int)), this->parent(), SLOT(getClientInfo(QList<QString>, int)));
+    connect(socket, SIGNAL(disconnected()), this, SLOT(getSocketDisconnected()));
 
     connect(this, SIGNAL(clientDisconnected(int)),this->parent(), SLOT(getClientDisconnected(int)));
 
-	//connect(socket, SIGNAL(disconnected()), socket, SLOT(deleteLater()));
-
-	connect(socket, SIGNAL(disconnected()), this, SLOT(getSocketDisconnected()));
+    //connect(socket, SIGNAL(disconnected()), socket, SLOT(deleteLater()));
 
 	connect(socket,SIGNAL(readyRead()),this,SLOT(receiveData()));
 
 	connect(socket, SIGNAL(error(QAbstractSocket::SocketError)), this, SLOT(displaySocketError(QAbstractSocket::SocketError)));
 
     //connect(this,SIGNAL(imageReceived(QImage)), TcpComm, SLOT(getClientImageReceived(QImage)));
+
+    // When neighbor info is received, notify the parent
     connect(this,SIGNAL(neighborInfo(navigationISL::robotInfo)),this->parent(),SLOT(receiveRobotInfo(navigationISL::robotInfo)));
 
+    // When coordinator update is received notify the parent
     connect(this,SIGNAL(coordinatorUpdate(navigationISL::robotInfo)),this->parent(),SLOT(receiveCoordinatorUpdate(navigationISL::robotInfo)));
 
-    messageDataSizeBuf = new char[50];
-	
-	messageBuf = new char[50];
-
-	clientSocketError = QAbstractSocket::UnknownSocketError; // initially no error
-
-	clearBuffers();
+    clientSocketError = QAbstractSocket::UnknownSocketError; // initially no error
 
 	speedCounter = 0;
 
@@ -66,184 +54,199 @@ Client::Client(QTcpSocket* sock, int clientType, QObject* parent):QObject(parent
 
     qDebug()<<"Client IP is: "<<IP;
 
-    QString str = "Hello this is server!!";
-
-    this->sendData(str.toAscii());
 
 }
-// outgoing client constructor
+// Outgoing client constructor
 Client::Client(int clientType, QObject* parent):QObject(parent)
 {
-    //id = clientID;
-
-    //TcpComm = (tcpComm*)parent;
-	//TcpComm = comm;
-
     socket = new QTcpSocket(this);
 	    
 	socket->setReadBufferSize(0);
 
 	type = clientType;
 
-    //hostName = TcpComm->getHostName();
-
-    //connect(this, SIGNAL(sendClientInfo(QList<QString>,int)), this->parent(), SLOT(getClientInfo(QList<QString>,int)));
-
     connect(this, SIGNAL(clientDisconnected(int)),this->parent(), SLOT(getClientDisconnected(int)));
 
     connect(socket, SIGNAL(disconnected()), this, SLOT(getSocketDisconnected()));
 
-	connect(socket,SIGNAL(readyRead()),this,SLOT(receiveData()));
+    //connect(socket,SIGNAL(readyRead()),this,SLOT(receiveData()));
 
 	connect(socket, SIGNAL(error(QAbstractSocket::SocketError)), this, SLOT(displaySocketError(QAbstractSocket::SocketError)));
 
-    messageDataSizeBuf = new char[250];
-    messageBuf = new char[250];
+
 
 	clientSocketError = QAbstractSocket::UnknownSocketError; // initially no error
 
-	clearBuffers();
-
-
-	/*	QString str;
-
-	str.setNum(id);
-
-	list<<str<<hostName<<IP;*/
-
-	//emit(sendClientInfo(list,type));
 }
-Client::~Client(){
+Client::~Client()
+{
 
-	delete[] messageBuf;
-	delete[] messageDataSizeBuf;
 
 }
-void Client::clearBuffers(){
+QByteArray Client::makeDataPackage(int task, int dataSize, QByteArray data)
+{
 
-	delete[]messageBuf;
-	delete[]messageDataSizeBuf;
+    QByteArray package;
 
-    messageBuf =  new char[250];
-    messageDataSizeBuf  = new char[250];
+    QString str;
 
-	for(int i = 0; i < 50; i++){
+    str = "AA";
 
-		messageBuf[i]  = 0;
-		messageDataSizeBuf[i] = 0;
+    package.append(str); // control byte
 
-	}
+    package.append(",");
+
+    str.setNum(task);
+
+    package.append(str); //task
+
+    package.append(",");
+
+    str.setNum(dataSize);
+
+    package.append(str);
+
+    package.append(",");
+
+    package.append(data); //data
+
+    return package;
+
 
 }
-
 void Client::receiveData(){
 	
-	
-	myRecDataBA = socket->readAll(); // read the length of the data received
+    // Read the buffer;
+    myRecDataBA = socket->readAll();
 
+    // Convert to QString
     myRecData = QString::fromAscii(myRecDataBA);
 
+    // Split the data (Comma seperated format)
     QStringList list = myRecData.split(",");
 
-    qDebug()<<"List size"<<list.size();
+    // Incoming data parts
+    qDebug()<<"Number of incoming data parts"<<list.size();
 
-    for(int i = 0; i < list.size();i++){
+  /*  for(int i = 0; i < list.size();i++){
 
         qDebug()<<list[i]<<" "<<i;
-    }
-    if(list.size()>0){
+    }*/
 
-        if(list.at(0) == "AA"){
-
+    // If list contains anything, process it
+    if(list.size()>0)
+    {
+        // If the control byte is correct
+        if(list.at(0) == "AA")
+        {
+            // Read the task
             int task = list.at(1).toInt();
 
-
+            // Clear the buffers
             myRecData.clear();
             myRecDataBA.clear();
 
+            // The end part contains the whole data
             myRecData = list.at(list.size()-1);
 
+            // Handle data
             this->handleTask(task,1);
 
 
         }
     }
-    /*int dot = 0; // "." points out that rest of the package is just data
 
-	if(myRecDataBA.at(0) == -86){ // if control byte is correct
-
-		//myRecDataBA = socket->read(1); // read task
-
-        int task = (int)((myRecDataBA.at(1)-48) + (myRecDataBA.at(2)-48));
-		
-
-		for(int i = 0; i < myRecDataBA.size(); i++){
-		
-			if(myRecDataBA.at(i) == '.'){
-				
-				dot = i; // found the end of data size information rest is just data
-				break;
-			
-			}
-		
-		}
-		int dataSize = 0;
-		int z = 0;
-
-		//////Calculate data size/////
-		for(int i = dot-1; i >= 2; i--){
-		
-			/// -48 is used to calculate numbers correctly 1 = 49 ascii 
-			
-			dataSize += (int)((myRecDataBA.at(i)-48)*pow((double)10, (double)z));
-			
-			z++;
-		
-		}
-		////////////////////////////
-
-
-		myRecDataBA.remove(0,dot+1); // remove the first bytes, only the data is left
-		
-	
-		if(dataSize != 0){
-
-			
-
-			myRecData = QString::fromAscii(myRecDataBA.data());
-
-		}
-
-		handleTask(task, dataSize);
-
-		myRecData.clear();
-
-		myRecDataBA.clear();
-
-
-	}
-	else{ // if package is not correct don't do anything clear buffers
-	
-		myRecData.clear();
-
-		myRecDataBA.clear();
-	
-	}
-*/
 	
 
 }
+
 void Client::sendData(QByteArray data){
 
 	socket->write(data); 
 	//socket->waitForBytesWritten(5000);
 
 }
-/// Displays socket error in a MessageBox
+void Client::handleTask(int task , int dataSize){
+
+    switch(task)
+    {
+    case SEND_HOST_NAME:
+        sendHostName();
+        break;
+    case RECV_HOST_NAME:
+        receiveHostName();
+        break;
+
+    case RECV_IMAGE:
+        receiveImage();
+        break;
+    case RECV_IMAGE_DSIZE:
+        receiveImageDataSize();
+        break;
+    case RECV_ROBOT_INFO:
+        receiveRobotInfo();
+        break;
+    case RECV_COORDINATOR_UPDATE:
+        receiveCoordinatorUpdate();
+        break;
+    default:
+        break;
+    }
+
+}
+void Client::getSocketDisconnected()
+{
+
+    // socket->deleteLater();
+    // if remote host has closed the connection
+
+   // socket->deleteLater();
+    emit(clientDisconnected(type));
+
+
+    /*	if(clientSocketError == QAbstractSocket::RemoteHostClosedError){
+
+    socket->deleteLater();
+
+    emit(clientDisconnected(id,type));
+
+    }
+    else if(clientSocketError == QAbstractSocket::UnknownSocketError){
+
+
+    socket->deleteLater();
+
+    emit(clientDisconnected(id,type));
+
+    }
+    else if(clientSocketError == QAbstractSocket::HostNotFoundError){
+
+    socket->deleteLater();
+
+    emit(clientDisconnected(id,type));
+
+    }
+    else if(clientSocketError == QAbstractSocket::SocketTimeoutError){
+
+    socket->deleteLater();
+
+    emit(clientDisconnected(id,type));
+    }
+    else if(clientSocketError == QAbstractSocket::co*/
+
+}
+// Displays socket error in a MessageBox
 void Client::displaySocketError(QAbstractSocket::SocketError socketError){
 
+    qDebug()<<"Socket Error!!!";
+
+    emit(clientDisconnected(type));
+
+   // socket->deleteLater();
+
     return;
-	QMessageBox information;
+
+    QMessageBox information;
 
 	switch (socketError) {
 	 case QAbstractSocket::RemoteHostClosedError:
@@ -277,75 +280,14 @@ void Client::displaySocketError(QAbstractSocket::SocketError socketError){
 	socket->deleteLater();
     emit(clientDisconnected(type));
 }
-int Client::getClientID(){
+QString Client::getHostName(){
 
-	return id;
-
-
-}
-void Client::setClientID(int clientid){
-
-
-	id = clientid;
-
-	QList<QString>list;
-
-	QString str;
-
-	str.setNum(id);
-
-	list<<str<<hostName<<IP;
-
-	emit(sendClientInfo(list,type));
-
+    return hostName;
 
 }
-void Client::getHostName(const QHostInfo &host)
-{
-	if (host.error() != QHostInfo::NoError) {
-		qDebug() << "Lookup failed:" << host.errorString();
-		return;
-	}
+void Client::setHostName(QString Name){
 
-	hostName = host.hostName();
-	host.addresses();
-
-	QString ids;
-	ids.setNum(id);
-
-	clientInfo<<ids<<hostName<<IP;
-
-	emit(sendClientInfo(clientInfo, type));
-
-}
-QByteArray Client::makeDataPackage(int task, int dataSize, QByteArray data)
-{
-
-	QByteArray package;
-
-	QString str;
-
-    str = "AA";
-
-    package.append(str); // control byte
-
-    package.append(",");
-
-    str.setNum(task);
-
-    package.append(str); //task
-
-    package.append(",");
-
-	str.setNum(dataSize); 
-
-	package.append(str);
-
-    package.append(",");
-
-	package.append(data); //data
-
-	return package;
+    hostName = Name;
 
 
 }
@@ -483,113 +425,19 @@ void Client::receiveCoordinatorUpdate()
 
 
 }
-void Client::setClientIP(QString ip){
+void Client::setIP(QString ip){
 
 	IP = ip;
 
-	QList<QString>list;
 
-	QString str;
-
-	str.setNum(id);
-
-	list<<str<<hostName<<IP;
 
     //emit(sendClientInfo(list,type));
 
 }
-void Client::getSocketDisconnected(){
-
-    // socket->deleteLater();
-	// if remote host has closed the connection
-
-//	socket->deleteLater();
-    emit(clientDisconnected(type));
+QString Client::getIP(){
 
 
-	/*	if(clientSocketError == QAbstractSocket::RemoteHostClosedError){ 
-
-	socket->deleteLater();
-
-	emit(clientDisconnected(id,type));
-
-	}
-	else if(clientSocketError == QAbstractSocket::UnknownSocketError){
-
-
-	socket->deleteLater();
-
-	emit(clientDisconnected(id,type));
-
-	}
-	else if(clientSocketError == QAbstractSocket::HostNotFoundError){
-
-	socket->deleteLater();
-
-	emit(clientDisconnected(id,type));
-
-	}
-	else if(clientSocketError == QAbstractSocket::SocketTimeoutError){
-
-	socket->deleteLater();
-
-	emit(clientDisconnected(id,type));
-	}
-	else if(clientSocketError == QAbstractSocket::co*/
-
-}
-QString Client::getClientIP(){
-
-
-	return IP;
-
-}
-QString Client::getClientHostName(){
-
-	return hostName;
-
-}
-void Client::setClientHostName(QString Name){
-
-	hostName = Name;
-
-	QList<QString>list;
-
-	QString str;
-
-	str.setNum(id);
-
-	list<<str<<hostName<<IP;
-
-	emit(sendClientInfo(list,type));
-
-}
-void Client::handleTask(int task , int dataSize){
-
-	switch(task)
-	{
-	case SEND_HOST_NAME:
-		sendHostName();
-		break;
-	case RECV_HOST_NAME:
-		setClientHostName(receiveHostName());
-		break;
-
-	case RECV_IMAGE:
-		receiveImage();
-		break;
-	case RECV_IMAGE_DSIZE:
-		receiveImageDataSize();
-		break;
-    case RECV_ROBOT_INFO:
-        receiveRobotInfo();
-        break;
-    case RECV_COORDINATOR_UPDATE:
-        receiveCoordinatorUpdate();
-        break;
-	default:
-		break;
-	}	
+    return IP;
 
 }
 void Client::receiveImage(){
@@ -693,10 +541,10 @@ void Client::sendHostName(){
 	sendData(dat);
 
 }
-QString Client::receiveHostName(){
+void Client::receiveHostName(){
 
 
-	return myRecData;
+    this->hostName = myRecData;
 
 
 }
@@ -768,5 +616,5 @@ void Client::sendAcknowledge(bool status){
 }
 void Client::receiveAcknowledge(){
 
-	emit(acknowledgeReceived(id));
+//	emit(acknowledgeReceived(id));
 }

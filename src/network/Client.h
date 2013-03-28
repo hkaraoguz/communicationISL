@@ -14,48 +14,53 @@ class Client : public QObject
 		Q_OBJECT
 public:
 	
-	//Client(QTcpSocket* sock, tcpComm* comm, int clientID, int clientType);
-
+    // Constructor for incoming Client
     Client(QTcpSocket* sock, int clientType, QObject* parent = 0);
 	
-	//Client(tcpComm* comm, int clientID, int clientType);
-
+    // Constructor for outgoing Client
     Client(int clientType, QObject* parent = 0);
+
+    ~Client(void);
 	
-	QTcpSocket* socket; // socket for communication
-	
-	tcpComm* TcpComm; // pointer to the parent tcpComm class
 
-	void clearBuffers(); /// Clear data buffers (reduntant)
+    // Socket for communication
+    QTcpSocket* socket;
 
-	void setClientID(int clientid); /// Sets client id
+    // Pointer to the parent tcpComm class (redundant)
+    tcpComm* TcpComm;
 
-	int getClientID(); /// Returns client id
+    // Return client IP
+    QString getIP();
 
-	QString getClientIP(); // Returns client IP
+    void setIP(QString ip);
 
-	void setClientIP(QString ip);
+    // Return client hostname
+    QString getHostName();
 
-	QString getClientHostName(); // Returns client HostName
+    void setHostName(QString Name);
 
-	void setClientHostName(QString Name);
-
+    // Prepare package for sending data
 	QByteArray makeDataPackage(int task, int dataSize, QByteArray data); // Prepare the Data Package
 
+    // Handle the incoming task
 	void handleTask(int task, int dataSize);
 
-	QString myRecData, mySentData;
-
+    // Send the hostname to the outgoing client
 	void sendHostName();
 
-	QString receiveHostName();
+    // Receive the incoming client's hostname
+    void receiveHostName();
 
+    // Send the current robot information to the outgoing client
     void sendRobotInfo(navigationISL::robotInfo info);
 
+    // Send the coordinator update to the outgoing client
     void sendCoordinatorUpdate(navigationISL::robotInfo info);
 
+    // Receive the coordinator update from the incoming client
     void receiveCoordinatorUpdate();
 
+    // Receive the robot info from the incoming client
     void receiveRobotInfo();
 
 	void receiveSPCounter(bool respond);
@@ -102,29 +107,21 @@ public:
 
 	bool speedTest;
 	
-public:
-	
-	~Client(void);
-
 private:
 
-	int id;
 
-    int type; // 0: incoming client, 1: outgoing client
 
-	char* messageDataSizeBuf;
-	
-	char* messageBuf;
+    // 0: incoming client, 1: outgoing client
+    int type;
 
-	QString IP;
+    QString IP;
 
 	QString hostName;
 	
-    //QHostAddress add;
-
-	QList<QString> clientInfo;
-
 	QAbstractSocket::SocketError clientSocketError;
+
+    // Received and Sent data
+    QString myRecData, mySentData;
 
 	QByteArray myRecDataBA;
 
@@ -135,12 +132,12 @@ private:
 		void sendData(QByteArray data);
 		void receiveData();
 		void displaySocketError(QAbstractSocket::SocketError socketError);
-		void getHostName(const QHostInfo &host);
+        //void getHostName(const QHostInfo &host);
 		void getSocketDisconnected();
 		void receiveImage();
 
 		signals:
-		//void clientIP(const QString &ip , int clientID);
+
         void clientDisconnected(int type);
 		void sendClientInfo(const QList<QString>& list, int type);
 		void imageReceived(const QImage& image);
