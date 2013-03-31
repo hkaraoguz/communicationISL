@@ -54,6 +54,15 @@ bool CommunicationManager::readConfigFile(QString filename)
 
         int numrobots = result["numrobots"].toInt();
         int iscoord =   result["iscoordinator"].toInt();
+        int robotID =   result["robotID"].toInt();
+
+        QString temp = QString::number(robotID);
+
+        QString temp2 = "IRobot"+temp;
+
+       // qDebug()<<temp2;
+
+        myrobot->setName(temp2);
 
         if(iscoord == 1) myrobot->setCoordinator(true);
 
@@ -308,6 +317,15 @@ void CommunicationManager::getClientDisconnected(int type)
 // Send the information to the coordinator
 void CommunicationManager::handleCoordinatorUpdate(navigationISL::robotInfo info)
 {
+    qDebug()<<"Coordinator update received from nav";
+    if(myrobot->isCoordinator())
+    {
+        info.neighbors.resize(1);
+        info.neighbors[0] = myrobot->getName().toStdString();
+        this->rosthread->coordinatorUpdatePublisher.publish(info);
+
+        return;
+    }
     for(int i = 0; i < robots.size(); i++)
     {
 

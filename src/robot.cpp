@@ -109,9 +109,19 @@ void Robot::receiveRobotInfo(navigationISL::robotInfo info)
     manager->rosthread->neighborInfoPublisher.publish(ninfo);
 
 }
+// Receive coordinator update from the client robot
 void Robot::receiveCoordinatorUpdate(navigationISL::robotInfo info)
 {
 
+    info.neighbors.resize(1);
+
+    info.neighbors[0] = this->name.toStdString();
+
+    CommunicationManager* manager = (CommunicationManager*)this->parent();
+
+    manager->rosthread->coordinatorUpdatePublisher.publish(info);
+
+    qDebug()<<"Received a coordinator update";
 
 }
 void Robot::sendCoordinatorUpdate(navigationISL::robotInfo info)

@@ -24,7 +24,7 @@ public:
 
      void shutdownROS();
 
-     //friend class CommunicationManager;
+     friend class CommunicationManager;
 
      friend class Robot;
 
@@ -39,6 +39,8 @@ private:
      ros::Subscriber robotInfoSubscriber;
 
      ros::Publisher neighborInfoPublisher;
+
+     ros::Publisher coordinatorUpdatePublisher;
 
      ros::Subscriber coordinatorUpdateSubscriber;
 
