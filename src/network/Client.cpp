@@ -152,6 +152,7 @@ void Client::receiveData(){
             // Handle data
             this->handleTask(task,1);
 
+            myRecData.clear();
 
         }
     }
@@ -163,7 +164,7 @@ void Client::receiveData(){
 void Client::sendData(QByteArray data){
 
 	socket->write(data); 
-    socket->waitForBytesWritten(500);
+   // socket->waitForBytesWritten(500);
 
 }
 void Client::handleTask(int task , int dataSize){

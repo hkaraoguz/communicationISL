@@ -164,7 +164,7 @@ void CommunicationManager::connecttt(){
 }
 void CommunicationManager::connectToHost(QString hostAddress, quint16 port)
 {
-    tempClient = new Client(OUTGOING_CLIENT,this);
+    Client* cl = new Client(OUTGOING_CLIENT,this);
 
    // connect(tempClient, SIGNAL(clientDisconnected(int)),this, SLOT(getClientDisconnected(int)));
 
@@ -174,11 +174,11 @@ void CommunicationManager::connectToHost(QString hostAddress, quint16 port)
 
    // QObject::connect(tempClient->socket,SIGNAL(error(QAbstractSocket::SocketError)),this,SLOT(handleSocketError(QAbstractSocket::SocketError)));
 
-    tempClient->setIP(hostAddress);
+    cl->setIP(hostAddress);
 
-    tempClient->socket->connectToHost(hostAddress,port);
+    cl->socket->connectToHost(hostAddress,port);
 
-    if(tempClient->socket->waitForConnected(1000)){
+    if(cl->socket->waitForConnected(1000)){
 
         for(int i = 0; i < robots.size() ; i++){
 
@@ -186,21 +186,22 @@ void CommunicationManager::connectToHost(QString hostAddress, quint16 port)
 
           //  qDebug()<<tempClient->getClientIP();
 
-            if(robots[i]->getIP() == tempClient->getIP())
+            if(robots[i]->getIP() == cl->getIP())
             {
-                QObject::disconnect(tempClient,SIGNAL(clientDisconnected(int)),this,SLOT(getClientDisconnected(int)));
+                QObject::disconnect(cl,SIGNAL(clientDisconnected(int)),this,SLOT(getClientDisconnected(int)));
 
-                tempClient->setParent(robots[i]);
+                cl->setParent(robots[i]);
 
-                connect(tempClient, SIGNAL(clientDisconnected(int)),robots[i], SLOT(getClientDisconnected(int)));
+                connect(cl, SIGNAL(clientDisconnected(int)),robots[i], SLOT(getClientDisconnected(int)));
 
-                robots[i]->setOutgoingClient(tempClient);
+                robots[i]->setOutgoingClient(cl);
 
                 robots[i]->setOutGoingConnected(true);
 
                 qDebug()<<"Outgoing connected";
 
-               // tempClient = 0;
+                //tempClient=0;
+                //tempClient->deleteLater();
 
                 return;
             }
@@ -214,7 +215,7 @@ void CommunicationManager::connectToHost(QString hostAddress, quint16 port)
 
         for(int i = 0; i < robots.size() ; i++){
 
-            if(robots[i]->getIP() == tempClient->getIP())
+            if(robots[i]->getIP() == cl->getIP())
             {
 
                 robots[i]->setOutGoingConnected(false);
@@ -225,8 +226,8 @@ void CommunicationManager::connectToHost(QString hostAddress, quint16 port)
 
        /* tempClient->socket->deleteLater();
         tempClient->socket = 0;*/
-        tempClient->deleteLater();
-        tempClient = 0;
+      //  tempClient->deleteLater();
+      //  tempClient = 0;
 
 
     }
@@ -348,18 +349,19 @@ void CommunicationManager::handleCoordinatorUpdate(navigationISL::robotInfo info
 }
 void CommunicationManager::handleNavigationISLInfo(navigationISL::robotInfo msg)
 {
+    navigationISL::robotInfo info = msg;
 
-    qDebug()<<msg.posX<<" "<<msg.posY;
+  // qDebug()<<msg.posX<<" "<<msg.posY;
 
-    for(int i = 0; i < msg.neighbors.size(); i++){
+    for(int i = 0; i < info.neighbors.size(); i++){
 
         for(int j = 0; j < robots.size(); j++)
         {
 
-            if(msg.neighbors[i].compare(robots[j]->getName().toStdString()) == 0)
+            if(info.neighbors[i].compare(robots[j]->getName().toStdString()) == 0)
             {
 
-                    robots[j]->sendRobotInfo(msg);
+                    robots[j]->sendRobotInfo(info);
 
                     break;
 
