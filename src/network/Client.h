@@ -52,16 +52,16 @@ public:
     void receiveHostName();
 
     // Send the current robot information to the outgoing client
-    void sendRobotInfo(navigationISL::robotInfo info);
+    void sendRobotInfotoNeighbor(navigationISL::robotInfo info);
 
     // Send the coordinator update to the outgoing client
-    void sendCoordinatorUpdate(navigationISL::robotInfo info);
+    void sendCoordinatorUpdatetoCoordinator(navigationISL::neighborInfo info);
 
     // Receive the coordinator update from the incoming client
-    void receiveCoordinatorUpdate();
+    void receiveCoordinatorUpdateFromClient();
 
     // Receive the robot info from the incoming client
-    void receiveRobotInfo();
+    void receiveRobotInfoFromNeighbor();
 
 	void receiveSPCounter(bool respond);
 
@@ -143,6 +143,6 @@ private:
 		void imageReceived(const QImage& image);
 		void acknowledgeReceived(int id);
         void neighborInfo(navigationISL::robotInfo info);
-        void coordinatorUpdate(navigationISL::robotInfo info);
+        void coordinatorUpdate(navigationISL::neighborInfo info);
 	
 };

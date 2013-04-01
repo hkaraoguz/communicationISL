@@ -44,7 +44,7 @@ Client::Client(QTcpSocket* sock, int clientType, QObject* parent):QObject(parent
     connect(this,SIGNAL(neighborInfo(navigationISL::robotInfo)),this->parent(),SLOT(receiveRobotInfo(navigationISL::robotInfo)));
 
     // When coordinator update is received notify the parent
-    connect(this,SIGNAL(coordinatorUpdate(navigationISL::robotInfo)),this->parent(),SLOT(receiveCoordinatorUpdate(navigationISL::robotInfo)));
+    connect(this,SIGNAL(coordinatorUpdate(navigationISL::neighborInfo)),this->parent(),SLOT(receiveCoordinatorUpdate(navigationISL::neighborInfo)));
 
     clientSocketError = QAbstractSocket::UnknownSocketError; // initially no error
 
@@ -127,7 +127,7 @@ void Client::receiveData(){
 
     // Incoming data parts
     qDebug()<<"Number of incoming data parts"<<list.size();
-
+    qDebug()<<list;
   /*  for(int i = 0; i < list.size();i++){
 
         qDebug()<<list[i]<<" "<<i;
@@ -163,7 +163,7 @@ void Client::receiveData(){
 void Client::sendData(QByteArray data){
 
 	socket->write(data); 
-	//socket->waitForBytesWritten(5000);
+    socket->waitForBytesWritten(500);
 
 }
 void Client::handleTask(int task , int dataSize){
@@ -184,10 +184,10 @@ void Client::handleTask(int task , int dataSize){
         receiveImageDataSize();
         break;
     case RECV_ROBOT_INFO:
-        receiveRobotInfo();
+        receiveRobotInfoFromNeighbor();
         break;
     case RECV_COORDINATOR_UPDATE:
-        receiveCoordinatorUpdate();
+        receiveCoordinatorUpdateFromClient();
         break;
     default:
         break;
@@ -292,7 +292,7 @@ void Client::setHostName(QString Name){
 
 
 }
-void Client::sendRobotInfo(navigationISL::robotInfo info)
+void Client::sendRobotInfotoNeighbor(navigationISL::robotInfo info)
 {
     QByteArray data;
 
@@ -352,7 +352,7 @@ void Client::sendRobotInfo(navigationISL::robotInfo info)
 
 
 }
-void Client::receiveRobotInfo()
+void Client::receiveRobotInfoFromNeighbor()
 {
     navigationISL::robotInfo robotInfo;
 
@@ -388,7 +388,7 @@ void Client::receiveRobotInfo()
 
 
 }
-void Client::sendCoordinatorUpdate(navigationISL::robotInfo info)
+void Client::sendCoordinatorUpdatetoCoordinator(navigationISL::neighborInfo info)
 {
     QByteArray data;
 
@@ -409,20 +409,22 @@ void Client::sendCoordinatorUpdate(navigationISL::robotInfo info)
     sendData(dat);
 
 }
-void Client::receiveCoordinatorUpdate()
+void Client::receiveCoordinatorUpdateFromClient()
 {
-    navigationISL::robotInfo robotInfo;
+    navigationISL::neighborInfo info;
 
     QStringList result = myRecData.split(";");
 
+    qDebug()<<result;
+
     if(result.size() > 1)
     {
-        robotInfo.posX = result.at(0).toFloat();
+        info.posX = result.at(0).toFloat();
 
-        robotInfo.posY = result.at(1).toFloat();
+        info.posY = result.at(1).toFloat();
 
 
-        emit coordinatorUpdate(robotInfo);
+        emit coordinatorUpdate(info);
     }
 
 

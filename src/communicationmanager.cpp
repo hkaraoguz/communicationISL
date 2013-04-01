@@ -200,9 +200,9 @@ void CommunicationManager::connectToHost(QString hostAddress, quint16 port)
 
                 qDebug()<<"Outgoing connected";
 
-                tempClient = 0;
+               // tempClient = 0;
 
-                break;
+                return;
             }
         }
 
@@ -317,12 +317,17 @@ void CommunicationManager::getClientDisconnected(int type)
 // Send the information to the coordinator
 void CommunicationManager::handleCoordinatorUpdate(navigationISL::robotInfo info)
 {
+    navigationISL::neighborInfo inf;
+
+    inf.name = myrobot->getName().toStdString();
+    inf.posX = info.posX;
+    inf.posY = info.posY;
+
     qDebug()<<"Coordinator update received from nav";
+
     if(myrobot->isCoordinator())
     {
-        info.neighbors.resize(1);
-        info.neighbors[0] = myrobot->getName().toStdString();
-        this->rosthread->coordinatorUpdatePublisher.publish(info);
+        this->rosthread->coordinatorUpdatePublisher.publish(inf);
 
         return;
     }
@@ -332,7 +337,8 @@ void CommunicationManager::handleCoordinatorUpdate(navigationISL::robotInfo info
         if(robots[i]->isCoordinator())
         {
 
-            robots[i]->sendCoordinatorUpdate(info);
+
+            robots[i]->sendCoordinatorUpdatetoCoordinator(inf);
 
             break;
         }
@@ -352,12 +358,11 @@ void CommunicationManager::handleNavigationISLInfo(navigationISL::robotInfo msg)
 
             if(msg.neighbors[i].compare(robots[j]->getName().toStdString()) == 0)
             {
-                if(robots[j]->isOutgoingConnected())
-                {
+
                     robots[j]->sendRobotInfo(msg);
 
                     break;
-                }
+
 
             }
         }

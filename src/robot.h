@@ -16,7 +16,7 @@ public:
 
     void setRobotInfo(navigationISL::robotInfo info);
 
-    void sendCoordinatorUpdate(navigationISL::robotInfo info);
+    void sendCoordinatorUpdatetoCoordinator(navigationISL::neighborInfo info);
 
     navigationISL::robotInfo getRobotInfo();
 
@@ -72,7 +72,7 @@ public slots:
     void receiveRobotInfo(navigationISL::robotInfo info);
 
     // Receive a coordinator update info from a robot
-    void receiveCoordinatorUpdate(navigationISL::robotInfo info);
+    void receiveCoordinatorUpdate(navigationISL::neighborInfo info);
 
 
     

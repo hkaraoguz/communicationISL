@@ -63,7 +63,8 @@ void Robot::setIncomingConnected(bool status){
 }
 void Robot::sendRobotInfo(navigationISL::robotInfo info)
 {
-    this->outgoingclient->sendRobotInfo(info);
+    if(outgoingConnected)
+        this->outgoingclient->sendRobotInfotoNeighbor(info);
 }
 bool Robot::isCoordinator()
 {
@@ -104,18 +105,22 @@ void Robot::receiveRobotInfo(navigationISL::robotInfo info)
 
     ninfo.radius = this->info.radius;
 
+    ninfo.targetX = this->info.targetX;
+
+    ninfo.targetY = this->info.targetY;
+
     CommunicationManager* manager = (CommunicationManager*)this->parent();
 
     manager->rosthread->neighborInfoPublisher.publish(ninfo);
 
 }
 // Receive coordinator update from the client robot
-void Robot::receiveCoordinatorUpdate(navigationISL::robotInfo info)
+void Robot::receiveCoordinatorUpdate(navigationISL::neighborInfo info)
 {
 
-    info.neighbors.resize(1);
+    info.name = name.toStdString();
 
-    info.neighbors[0] = this->name.toStdString();
+    qDebug()<<QString::fromStdString(info.name)<<info.posX<<info.posY;
 
     CommunicationManager* manager = (CommunicationManager*)this->parent();
 
@@ -124,10 +129,10 @@ void Robot::receiveCoordinatorUpdate(navigationISL::robotInfo info)
     qDebug()<<"Received a coordinator update";
 
 }
-void Robot::sendCoordinatorUpdate(navigationISL::robotInfo info)
+void Robot::sendCoordinatorUpdatetoCoordinator(navigationISL::neighborInfo info)
 {
-
-    this->outgoingclient->sendCoordinatorUpdate(info);
+    if(this->isOutgoingConnected())
+        this->outgoingclient->sendCoordinatorUpdatetoCoordinator(info);
 
 
 

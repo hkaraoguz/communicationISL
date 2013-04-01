@@ -40,8 +40,10 @@ private:
 
      ros::Publisher neighborInfoPublisher;
 
+     // Publish the received coordinator Update
      ros::Publisher coordinatorUpdatePublisher;
 
+     // This is the subscriber for coordinatorUpdate from nav
      ros::Subscriber coordinatorUpdateSubscriber;
 
 

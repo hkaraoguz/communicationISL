@@ -34,19 +34,26 @@ void RosThread::work(){
 
      coordinatorUpdateSubscriber = n.subscribe("navigationISL/coordinatorUpdate",1,&CommunicationManager::handleCoordinatorUpdate,this->manager);
 
+     // Sends the received neighbor info to the navigationNode
      neighborInfoPublisher = n.advertise<navigationISL::neighborInfo>("communicationISL/neighborInfo",1);
   //  this->amclSub = n.subscribe("amcl_pose",2,&RosThread::amclPoseCallback,this);
 
-     // Publishes the received coordinator Update from a robot to the coordinator node
+     // Publishes the received coordinator update from a robot to the coordinator node
      coordinatorUpdatePublisher = n.advertise<navigationISL::neighborInfo>("communicationISL/coordinatorUpdate",1);
 
-     ros::AsyncSpinner spinner(2);
+    /* navigationISL::robotInfo inf;
+     inf.neighbors.resize(1);
+     inf.posX = 2;
+     inf.posY =3;*/
+    // ros::AsyncSpinner spinner(2);
 
-     spinner.start();
+   //  spinner.start();
 
-   // ros::Rate loop(30);
+    ros::Rate loop(30);
 
     while(ros::ok()){
+
+        //coordinatorUpdatePublisher.publish(inf);
 
           //  NavigationController::robotContoller(vel, numOfRobots, bin, bt, b_rs, ro, kkLimits);
 
@@ -54,7 +61,8 @@ void RosThread::work(){
 
              //   loop.sleep();
 
-
+        ros::spinOnce();
+        loop.sleep();
 
     }
 
