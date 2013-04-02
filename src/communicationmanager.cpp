@@ -71,6 +71,8 @@ bool CommunicationManager::readConfigFile(QString filename)
 
         if(iscoord == 1) myrobot->setCoordinator(true);
 
+
+
         this->robots.resize(numrobots);
 
         QVariantMap nestedMap = result["Robots"].toMap();
@@ -91,10 +93,11 @@ bool CommunicationManager::readConfigFile(QString filename)
 
             if(coord == 1) robot->setCoordinator(true);
 
-            if(!robot->isCoordinator())
+            if(robot->isCoordinator())
             {
                 connect(robot,SIGNAL(networkInfo(QStringList)),this,SLOT(handleNetworkInfo(QStringList)));
             }
+
 
             this->robots[count] = robot;
 
