@@ -461,7 +461,7 @@ void CommunicationManager::handleNetworkUpdateFromCoordinator(navigationISL::net
                 if(nbrs.at(j).size()>= 1)
                 {
 
-                    QStringList list = nbrs.at(id-1).split(";");
+                    QStringList list = nbrs.at(j).split(";");
 
                     QString name = "IRobot";
                     name.append(QString::number(j+1));
@@ -547,10 +547,17 @@ void CommunicationManager::handleNetworkInfo(QStringList list)
     this->neighbors = list;
 
     // If this is the first time we received the network info
-    if(!firstNetworkReceived){
+    if(!firstNetworkReceived)
+    {
 
         firstNetworkReceived = true;
         this->connectToRobots();
+
+        navigationISL::neighborInfo inf;
+
+        inf.name = "start";
+
+        this->rosthread->neighborInfoPublisher.publish(inf);
     }
 
     qDebug()<<myrobot->getName()<<" neighbors "<<this->neighbors;
