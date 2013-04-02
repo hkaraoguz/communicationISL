@@ -525,19 +525,9 @@ void CommunicationManager::handleNetworkUpdateFromCoordinator(navigationISL::net
                         }
                     }
 
-                    file.close();
+
 
                 }
-               /* else
-                {
-                    if(nbrs.at(j) != QString::number(0))
-                    {
-                        this->robots.at(k)->sendNetworkInfo(nbrs);
-
-
-
-                    }
-                }*/
 
 
 
@@ -545,7 +535,11 @@ void CommunicationManager::handleNetworkUpdateFromCoordinator(navigationISL::net
 
         }
 
+        file.close();
+
     }
+
+
 
 
 }
