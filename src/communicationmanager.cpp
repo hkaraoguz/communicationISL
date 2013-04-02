@@ -4,6 +4,7 @@
 #include <QTreeWidget>
 #include <qjson/parser.h>
 #include "rosThread.h"
+#include "Client.h"
 CommunicationManager::CommunicationManager(QObject *parent) :
     QObject(parent)
 {
@@ -335,12 +336,25 @@ void CommunicationManager::handleCoordinatorUpdate(navigationISL::robotInfo info
     inf.posX = info.posX;
     inf.posY = info.posY;
 
+    QFile file("../toCoordinator.txt");
+
+    if(!file.exists())
+    {
+        file.open(QFile::WriteOnly);
+    }
+    else
+    {
+        file.open(QFile::Append);
+
+    }
+    QTextStream stream(&file);
+
     qDebug()<<"Coordinator update received from nav";
 
     if(myrobot->isCoordinator())
     {
         this->rosthread->coordinatorUpdatePublisher.publish(inf);
-
+        file.close();
         return;
     }
     for(int i = 0; i < robots.size(); i++)
@@ -348,13 +362,21 @@ void CommunicationManager::handleCoordinatorUpdate(navigationISL::robotInfo info
 
         if(robots[i]->isCoordinator())
         {
+            QString str = robots[i]->getName();
 
+            str.remove("IRobot");
+
+            int val = Client::RECV_COORDINATOR_UPDATE;
+
+            stream << QDateTime::currentDateTime().toTime_t()<<" "<<" "<<val<<" "<<inf.posX<<";"<<inf.posY<<" "<<str;
 
             robots[i]->sendCoordinatorUpdatetoCoordinator(inf);
 
             break;
         }
     }
+
+    file.close();
 
 
 }
