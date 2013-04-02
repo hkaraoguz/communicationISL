@@ -63,8 +63,34 @@ void Robot::setIncomingConnected(bool status){
 }
 void Robot::sendRobotInfo(navigationISL::robotInfo info)
 {
+
     if(outgoingConnected)
+    {
         this->outgoingclient->sendRobotInfotoNeighbor(info);
+
+        QFile file("../toRobot.txt");
+
+        if(!file.exists())
+        {
+            file.open(QFile::WriteOnly);
+        }
+        else
+        {
+            file.open(QFile::Append);
+
+        }
+        QTextStream stream(&file);
+
+        QString str = this->name;
+
+        str.remove("IRobot");
+
+        int val = Client::RECV_ROBOT_INFO;
+
+        stream << QDateTime::currentDateTime().toTime_t()<<" "<<" "<<val<<" "<<info.posX<<";"<<info.posY<<";"<<info.radius<<" "<<str<<"\n";
+
+        file.close();
+    }
 }
 bool Robot::isCoordinator()
 {
@@ -120,10 +146,34 @@ void Robot::receiveRobotInfo(navigationISL::robotInfo info)
 
     manager->rosthread->neighborInfoPublisher.publish(ninfo);
 
+    QFile file("../fromRobot.txt");
+
+    if(!file.exists())
+    {
+        file.open(QFile::WriteOnly);
+    }
+    else
+    {
+        file.open(QFile::Append);
+
+    }
+    QTextStream stream(&file);
+
+    QString str = this->name;
+
+    str.remove("IRobot");
+
+    int val = Client::RECV_ROBOT_INFO;
+
+    stream << QDateTime::currentDateTime().toTime_t()<<" "<<" "<<val<<" "<<info.posX<<";"<<info.posY<<";"<<info.radius<<" "<<str<<"\n";
+
+    file.close();
+
 }
 // Receive coordinator update from the client robot
 void Robot::receiveCoordinatorUpdate(navigationISL::neighborInfo info)
 {
+
 
     info.name = name.toStdString();
 
@@ -134,6 +184,29 @@ void Robot::receiveCoordinatorUpdate(navigationISL::neighborInfo info)
     manager->rosthread->coordinatorUpdatePublisher.publish(info);
 
     qDebug()<<"Received a coordinator update";
+
+    QFile file("../CoordinatorReceivedUpdate.txt");
+
+    if(!file.exists())
+    {
+        file.open(QFile::WriteOnly);
+    }
+    else
+    {
+        file.open(QFile::Append);
+
+    }
+    QTextStream stream(&file);
+
+    QString str = this->name;
+
+    str.remove("IRobot");
+
+    int val = Client::RECV_COORDINATOR_UPDATE;
+
+    stream << QDateTime::currentDateTime().toTime_t()<<" "<<" "<<val<<" "<<info.posX<<";"<<info.posY<<" "<<str<<"\n";
+
+    file.close();
 
 }
 void Robot::sendCoordinatorUpdatetoCoordinator(navigationISL::neighborInfo info)

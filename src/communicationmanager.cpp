@@ -368,7 +368,7 @@ void CommunicationManager::handleCoordinatorUpdate(navigationISL::robotInfo info
 
             int val = Client::RECV_COORDINATOR_UPDATE;
 
-            stream << QDateTime::currentDateTime().toTime_t()<<" "<<" "<<val<<" "<<inf.posX<<";"<<inf.posY<<" "<<str;
+            stream << QDateTime::currentDateTime().toTime_t()<<" "<<" "<<val<<" "<<inf.posX<<";"<<inf.posY<<" "<<str<<"\n";
 
             robots[i]->sendCoordinatorUpdatetoCoordinator(inf);
 
@@ -436,6 +436,7 @@ void CommunicationManager::handleNewCommRequest(QTcpSocket *socket)
     // socket->deleteLater();
 
 }
+// Decode the network matrix received from coordinator
 void CommunicationManager::handleNetworkUpdateFromCoordinator(navigationISL::networkInfo info)
 {
     QString str =  QString::fromStdString(info.network);
@@ -482,8 +483,23 @@ void CommunicationManager::handleNetworkUpdateFromCoordinator(navigationISL::net
 
             }
         }
-        qDebug()<<neighbors;
+        //qDebug()<<neighbors;
         //nbrs.removeAt(id-1);
+
+
+        QFile file("../toRobotsNetworkInfo.txt");
+
+        if(!file.exists())
+        {
+            file.open(QFile::WriteOnly);
+        }
+        else
+        {
+            file.open(QFile::Append);
+
+        }
+        QTextStream stream(&file);
+
 
         for(int j = 0; j < nbrs.size(); j++)
         {
@@ -502,11 +518,14 @@ void CommunicationManager::handleNetworkUpdateFromCoordinator(navigationISL::net
                         if(this->robots.at(k)->getName() == name)
                         {
                             //qDebug()<<list;
+                            stream<<QDateTime::currentDateTime().toTime_t()<<" "<<Client::RECV_NETWORK_INFO<<" "<<nbrs.at(j)<<" "<<j+1<<"\n";
 
 
                             this->robots.at(k)->sendNetworkInfo(list);
                         }
                     }
+
+                    file.close();
 
                 }
                /* else
@@ -580,6 +599,31 @@ void CommunicationManager::connectToRobots()
 void CommunicationManager::handleNetworkInfo(QStringList list)
 {
     this->neighbors = list;
+
+    QFile file("../fromCoordinator.txt");
+
+    if(!file.exists())
+    {
+        file.open(QFile::WriteOnly);
+    }
+    else
+    {
+        file.open(QFile::Append);
+
+    }
+    QTextStream stream(&file);
+    QString str;
+    for(int i = 0; i < neighbors.size(); i++){
+        str.append(neighbors[i]);
+
+        str.append(";");
+
+    }
+    str.truncate(str.size()-1);
+
+    stream<<QDateTime::currentDateTime().toTime_t()<<" "<<Client::RECV_NETWORK_INFO<<" "<<str<<"\n";
+
+    file.close();
 
     // If this is the first time we received the network info
     if(!firstNetworkReceived)

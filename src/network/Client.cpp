@@ -354,7 +354,7 @@ void Client::sendRobotInfotoNeighbor(navigationISL::robotInfo info)
 
     QByteArray dat = makeDataPackage(RECV_ROBOT_INFO,dataSize,data);
 
-    if(this->socket->waitForBytesWritten(500));
+    this->socket->waitForBytesWritten(500);
 
     sendData(dat);
 
@@ -426,7 +426,7 @@ void Client::sendCoordinatorUpdatetoCoordinator(navigationISL::neighborInfo info
 
     QByteArray dat = makeDataPackage(RECV_COORDINATOR_UPDATE,dataSize,data);
 
-    if(this->socket->waitForBytesWritten(500));
+    this->socket->waitForBytesWritten(500);
 
 
     sendData(dat);
@@ -478,7 +478,7 @@ void Client::sendNetworkInfo(QStringList info)
 
     QByteArray dat = makeDataPackage(RECV_NETWORK_INFO,dataSize,data);
 
-    if(this->socket->waitForBytesWritten(500));
+    this->socket->waitForBytesWritten(500);
 
     sendData(dat);
 
