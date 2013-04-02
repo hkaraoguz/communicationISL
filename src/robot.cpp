@@ -87,7 +87,7 @@ void Robot::sendRobotInfo(navigationISL::robotInfo info)
 
         int val = Client::RECV_ROBOT_INFO;
 
-        stream << QDateTime::currentDateTime().toTime_t()<<" "<<" "<<val<<" "<<info.posX<<";"<<info.posY<<";"<<info.radius<<" "<<str<<"\n";
+        stream << QDateTime::currentDateTime().toTime_t()<<" "<<" "<<val<<" "<<info.posX<<" "<<info.posY<<" "<<info.radius<<" "<<str<<"\n";
 
         file.close();
     }
@@ -165,7 +165,7 @@ void Robot::receiveRobotInfo(navigationISL::robotInfo info)
 
     int val = Client::RECV_ROBOT_INFO;
 
-    stream << QDateTime::currentDateTime().toTime_t()<<" "<<" "<<val<<" "<<info.posX<<";"<<info.posY<<";"<<info.radius<<" "<<str<<"\n";
+    stream << QDateTime::currentDateTime().toTime_t()<<" "<<" "<<val<<" "<<info.posX<<" "<<info.posY<<" "<<info.radius<<" "<<str<<"\n";
 
     file.close();
 
@@ -204,7 +204,7 @@ void Robot::receiveCoordinatorUpdate(navigationISL::neighborInfo info)
 
     int val = Client::RECV_COORDINATOR_UPDATE;
 
-    stream << QDateTime::currentDateTime().toTime_t()<<" "<<" "<<val<<" "<<info.posX<<";"<<info.posY<<" "<<str<<"\n";
+    stream << QDateTime::currentDateTime().toTime_t()<<" "<<" "<<val<<" "<<info.posX<<" "<<info.posY<<" "<<str<<"\n";
 
     file.close();
 

@@ -368,7 +368,7 @@ void CommunicationManager::handleCoordinatorUpdate(navigationISL::robotInfo info
 
             int val = Client::RECV_COORDINATOR_UPDATE;
 
-            stream << QDateTime::currentDateTime().toTime_t()<<" "<<" "<<val<<" "<<inf.posX<<";"<<inf.posY<<" "<<str<<"\n";
+            stream << QDateTime::currentDateTime().toTime_t()<<" "<<" "<<val<<" "<<inf.posX<<" "<<inf.posY<<" "<<str<<"\n";
 
             robots[i]->sendCoordinatorUpdatetoCoordinator(inf);
 
@@ -518,10 +518,23 @@ void CommunicationManager::handleNetworkUpdateFromCoordinator(navigationISL::net
                         if(this->robots.at(k)->getName() == name)
                         {
                             //qDebug()<<list;
-                            stream<<QDateTime::currentDateTime().toTime_t()<<" "<<Client::RECV_NETWORK_INFO<<" "<<nbrs.at(j)<<" "<<j+1<<"\n";
 
 
                             this->robots.at(k)->sendNetworkInfo(list);
+                            QString strrr;
+                            for(int l = 0; l < list.size(); l++ )
+                            {
+                                QString tmp = list.at(l);
+
+                                tmp.remove("IRobot");
+
+                                strrr.append(tmp);
+                                strrr.append(";");
+
+                            }
+                            strrr.truncate(strrr.size()-1);
+                            stream<<QDateTime::currentDateTime().toTime_t()<<" "<<Client::RECV_NETWORK_INFO<<" "<<strrr<<" "<<j+1<<"\n";
+
                         }
                     }
 
