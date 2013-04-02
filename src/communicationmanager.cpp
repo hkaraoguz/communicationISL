@@ -91,6 +91,11 @@ bool CommunicationManager::readConfigFile(QString filename)
 
             if(coord == 1) robot->setCoordinator(true);
 
+            if(!robot->isCoordinator())
+            {
+                connect(robot,SIGNAL(networkInfo(QStringList)),this,SLOT(handleNetworkInfo(QStringList)));
+            }
+
             this->robots[count] = robot;
 
             count++;
