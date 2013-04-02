@@ -6,6 +6,7 @@
 #include "robot.h"
 #include <QObject>
 #include <navigationISL/robotInfo.h>
+#include <navigationISL/networkInfo.h>
 #include <QXmlStreamReader>
 
 class RosThread;
@@ -22,29 +23,32 @@ public:
     // Handle messages from Navigation ISL
     void handleNavigationISLInfo(navigationISL::robotInfo msg);
 
+    // Handle coordinator updates from Navigation ISL
     void handleCoordinatorUpdate(navigationISL::robotInfo info);
+
+    void handleNetworkUpdateFromCoordinator(navigationISL::networkInfo info);
 
     bool readConfigFile(QString filename);
 
     bool initializeNetwork();
-
-
 
     RosThread* rosthread;
 
 private:
 
     tcpComm* TcpComm;
+
     QTcpSocket tempSocket;
+
     Client* tempClient;
 
     QVector<Robot*> robots;
 
-    QVector<QString> neighbors;
+    QStringList neighbors;
 
     Robot* myrobot;
 
-
+    bool firstNetworkReceived;
 
    // RosThread* rosthread;
 
@@ -65,6 +69,8 @@ private slots:
     void getClientDisconnected(int type);
 
     void connectToRobots();
+
+    void handleNetworkInfo(QStringList list);
 };
 
 #endif // COMMUNICATIONMANAGER_H

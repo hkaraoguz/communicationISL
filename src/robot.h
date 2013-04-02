@@ -18,6 +18,8 @@ public:
 
     void sendCoordinatorUpdatetoCoordinator(navigationISL::neighborInfo info);
 
+    void sendNetworkInfo(QStringList info);
+
     navigationISL::robotInfo getRobotInfo();
 
     void setName(QString nam);
@@ -64,6 +66,8 @@ private:
     bool coordinator;
     
 signals:
+
+    void networkInfo(QStringList list);
     
 public slots:
     void getClientDisconnected(int type);
@@ -74,6 +78,7 @@ public slots:
     // Receive a coordinator update info from a robot
     void receiveCoordinatorUpdate(navigationISL::neighborInfo info);
 
+    void receiveNetworkInfoFromCoordinator(QStringList list);
 
     
 };

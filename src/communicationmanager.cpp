@@ -7,25 +7,30 @@
 CommunicationManager::CommunicationManager(QObject *parent) :
     QObject(parent)
 {
-   // robots.resize(1);
+    // robots.resize(1);
 
     myrobot = new Robot(this);
+
     if(!this->initializeNetwork())
     {
         qDebug()<<"Initialization failed";
     }
+    if(myrobot->isCoordinator())
+        firstNetworkReceived = true;
+    else
+        firstNetworkReceived = false;
 
-  //  Robot* robot = new Robot(this);
+    //  Robot* robot = new Robot(this);
 
- //   robot->setIP("127.0.1.1");
+    //   robot->setIP("127.0.1.1");
 
-  //  this->robots.push_back(robot);
+    //  this->robots.push_back(robot);
 
-  //  QTimer::singleShot(2000,this,SLOT(connecttt()));
+    //  QTimer::singleShot(2000,this,SLOT(connecttt()));
 
 
 
-   // this->connectToHost("192.168.68.225",1200);
+    // this->connectToHost("192.168.68.225",1200);
 }
 bool CommunicationManager::readConfigFile(QString filename)
 {
@@ -50,7 +55,7 @@ bool CommunicationManager::readConfigFile(QString filename)
     }
     else
     {
-       // qDebug()<<result["numrobots"].toString();
+        // qDebug()<<result["numrobots"].toString();
 
         int numrobots = result["numrobots"].toInt();
         int iscoord =   result["iscoordinator"].toInt();
@@ -60,7 +65,7 @@ bool CommunicationManager::readConfigFile(QString filename)
 
         QString temp2 = "IRobot"+temp;
 
-       // qDebug()<<temp2;
+        // qDebug()<<temp2;
 
         myrobot->setName(temp2);
 
@@ -89,7 +94,7 @@ bool CommunicationManager::readConfigFile(QString filename)
             this->robots[count] = robot;
 
             count++;
-           // qDebug() << "\t-" << plugin.toMap()["ip"].toString();
+            // qDebug() << "\t-" << plugin.toMap()["ip"].toString();
         }
 
 
@@ -99,7 +104,7 @@ bool CommunicationManager::readConfigFile(QString filename)
     file.close();
     return true;
 
-   /* QTreeWidget wg;
+    /* QTreeWidget wg;
 
     configReader = new QXmlStreamReader(&file);
 
@@ -156,23 +161,23 @@ bool CommunicationManager::readConfigFile(QString filename)
 }
 void CommunicationManager::connecttt(){
 
-  //  qDebug()<<"Error";
-  //  this->connectToHost("193.140.195.52",1200);
-   this->connectToHost("localhost",1200);
-  //  QTimer::singleShot(2000,this,SLOT(connecttt()));
+    //  qDebug()<<"Error";
+    //  this->connectToHost("193.140.195.52",1200);
+    this->connectToHost("localhost",1200);
+    //  QTimer::singleShot(2000,this,SLOT(connecttt()));
 
 }
 void CommunicationManager::connectToHost(QString hostAddress, quint16 port)
 {
     Client* cl = new Client(OUTGOING_CLIENT,this);
 
-   // connect(tempClient, SIGNAL(clientDisconnected(int)),this, SLOT(getClientDisconnected(int)));
+    // connect(tempClient, SIGNAL(clientDisconnected(int)),this, SLOT(getClientDisconnected(int)));
 
     //this->tempSocket = new QTcpSocket(this);
 
-   // QObject::connect(tempClient->socket,SIGNAL(connected()),this,SLOT(handleSocketConnect()));
+    // QObject::connect(tempClient->socket,SIGNAL(connected()),this,SLOT(handleSocketConnect()));
 
-   // QObject::connect(tempClient->socket,SIGNAL(error(QAbstractSocket::SocketError)),this,SLOT(handleSocketError(QAbstractSocket::SocketError)));
+    // QObject::connect(tempClient->socket,SIGNAL(error(QAbstractSocket::SocketError)),this,SLOT(handleSocketError(QAbstractSocket::SocketError)));
 
     cl->setIP(hostAddress);
 
@@ -182,9 +187,9 @@ void CommunicationManager::connectToHost(QString hostAddress, quint16 port)
 
         for(int i = 0; i < robots.size() ; i++){
 
-          //  qDebug()<<robots[i]->getIP();
+            //  qDebug()<<robots[i]->getIP();
 
-          //  qDebug()<<tempClient->getClientIP();
+            //  qDebug()<<tempClient->getClientIP();
 
             if(robots[i]->getIP() == cl->getIP())
             {
@@ -224,26 +229,26 @@ void CommunicationManager::connectToHost(QString hostAddress, quint16 port)
             }
         }
 
-       /* tempClient->socket->deleteLater();
+        /* tempClient->socket->deleteLater();
         tempClient->socket = 0;*/
-      //  tempClient->deleteLater();
-      //  tempClient = 0;
+        //  tempClient->deleteLater();
+        //  tempClient = 0;
 
 
     }
 }
 void CommunicationManager::handleSocketConnect()
 {
-   // Robot* robot = new Robot(this);
+    // Robot* robot = new Robot(this);
 
-   // tempClient->setParent(robot);
+    // tempClient->setParent(robot);
 
-   // robot->setOutgoingClient(tempClient);
+    // robot->setOutgoingClient(tempClient);
 
 
 
-  //  this->robots.push_back(robot);
-   /* int id = TcpComm->findEmptyOutgoingClientSlot();
+    //  this->robots.push_back(robot);
+    /* int id = TcpComm->findEmptyOutgoingClientSlot();
 
     if(id >= 0){
 
@@ -275,9 +280,9 @@ void CommunicationManager::handleSocketConnect()
     aClient->sendData(arr);*/
     //this->TcpComm->
 
-        qDebug()<<"Connected";
+    qDebug()<<"Connected";
     //}
-   /* else
+    /* else
     {
 
         tempClient->socket->abort();
@@ -351,19 +356,19 @@ void CommunicationManager::handleNavigationISLInfo(navigationISL::robotInfo msg)
 {
     navigationISL::robotInfo info = msg;
 
-  // qDebug()<<msg.posX<<" "<<msg.posY;
+    // qDebug()<<msg.posX<<" "<<msg.posY;
 
-    for(int i = 0; i < info.neighbors.size(); i++){
+    for(int i = 0; i < neighbors.size(); i++){
 
         for(int j = 0; j < robots.size(); j++)
         {
 
-            if(info.neighbors[i].compare(robots[j]->getName().toStdString()) == 0)
+            if(neighbors[i] ==  robots[j]->getName())
             {
 
-                    robots[j]->sendRobotInfo(info);
+                robots[j]->sendRobotInfo(info);
 
-                    break;
+                break;
 
 
             }
@@ -387,7 +392,7 @@ void CommunicationManager::handleNewCommRequest(QTcpSocket *socket)
 
             if(myrobot->isCoordinator())
             {
-              //  connect(robots.at(i)->incomingclient,SIGNAL(coordinatorUpdate(navigationISL::robotInfo)), this,SLOT(handleCoordinatorInfo));
+                //  connect(robots.at(i)->incomingclient,SIGNAL(coordinatorUpdate(navigationISL::robotInfo)), this,SLOT(handleCoordinatorInfo));
 
             }
 
@@ -400,7 +405,90 @@ void CommunicationManager::handleNewCommRequest(QTcpSocket *socket)
     }
 
     socket->abort();
-   // socket->deleteLater();
+    // socket->deleteLater();
+
+}
+void CommunicationManager::handleNetworkUpdateFromCoordinator(navigationISL::networkInfo info)
+{
+    QString str =  QString::fromStdString(info.network);
+
+    QStringList nbrs = str.split(",");
+
+    //qDebug()<<nbrs;
+
+    if(myrobot->isCoordinator())
+    {
+        QString temp = myrobot->getName();
+
+        temp.remove("IRobot");
+
+        int id = temp.toInt();
+
+        if(nbrs.at(id-1).size()> 1)
+        {
+
+            this->neighbors.clear();
+
+            neighbors = nbrs.at(id-1).split(";");
+
+        }
+        else
+        {
+            neighbors.clear();
+
+            if(nbrs.at(id-1) != "0")
+            {
+
+                neighbors.push_back(nbrs.at(id-1));
+
+            }
+        }
+        qDebug()<<neighbors;
+        //nbrs.removeAt(id-1);
+
+        for(int j = 0; j < nbrs.size(); j++)
+        {
+            if(j != (id-1))
+            {
+                if(nbrs.at(j).size()>= 1)
+                {
+
+                    QStringList list = nbrs.at(id-1).split(";");
+
+                    QString name = "IRobot";
+                    name.append(QString::number(j+1));
+
+                    for(int k = 0; k < this->robots.size(); k++)
+                    {
+                        if(this->robots.at(k)->getName() == name)
+                        {
+                            //qDebug()<<list;
+
+
+                            this->robots.at(k)->sendNetworkInfo(list);
+                        }
+                    }
+
+                }
+               /* else
+                {
+                    if(nbrs.at(j) != QString::number(0))
+                    {
+                        this->robots.at(k)->sendNetworkInfo(nbrs);
+
+
+
+                    }
+                }*/
+
+
+
+            }
+
+        }
+
+    }
+
 
 }
 bool CommunicationManager::initializeNetwork()
@@ -420,8 +508,13 @@ bool CommunicationManager::initializeNetwork()
     // Direct incoming connections to the slot
     QObject::connect(this->TcpComm->myServer,SIGNAL(newCommRequest(QTcpSocket*)),this,SLOT(handleNewCommRequest(QTcpSocket*)));
 
+    // If I am the coordinator I should connect to other robots
+    if(myrobot->isCoordinator())
+    {
+        this->connectToRobots();
+    }
     // After 5 seconds start to connect with other robots
-    QTimer::singleShot(5000,this,SLOT(connectToRobots()));
+    // QTimer::singleShot(5000,this,SLOT(connectToRobots()));
 
     return true;
 
@@ -440,5 +533,18 @@ void CommunicationManager::connectToRobots()
 
 
 
+}
+void CommunicationManager::handleNetworkInfo(QStringList list)
+{
+    this->neighbors = list;
+
+    // If this is the first time we received the network info
+    if(!firstNetworkReceived){
+
+        firstNetworkReceived = true;
+        this->connectToRobots();
+    }
+
+    qDebug()<<myrobot->getName()<<" neighbors "<<this->neighbors;
 }
 

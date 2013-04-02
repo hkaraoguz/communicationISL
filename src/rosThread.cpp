@@ -41,6 +41,7 @@ void RosThread::work(){
      // Publishes the received coordinator update from a robot to the coordinator node
      coordinatorUpdatePublisher = n.advertise<navigationISL::neighborInfo>("communicationISL/coordinatorUpdate",1);
 
+     networkUpdateSubscriber = n.subscribe("coordinatorISL/networkInfo",1,&CommunicationManager::handleNetworkUpdateFromCoordinator,this->manager);
     /* navigationISL::robotInfo inf;
      inf.neighbors.resize(1);
      inf.posX = 2;

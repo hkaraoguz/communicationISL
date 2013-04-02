@@ -3,6 +3,7 @@
 #include <QObject>
 #include <ros/ros.h>
 #include "navigationISL/robotInfo.h"
+#include <navigationISL/networkInfo.h>
 #include "communicationmanager.h"
 #include <QTimer>
 
@@ -40,11 +41,14 @@ private:
 
      ros::Publisher neighborInfoPublisher;
 
-     // Publish the received coordinator Update
+     // Publish the received coordinator Update to the coordinator
      ros::Publisher coordinatorUpdatePublisher;
 
-     // This is the subscriber for coordinatorUpdate from nav
+     // Subscribe for coordinatorUpdate from Navigation
      ros::Subscriber coordinatorUpdateSubscriber;
+
+     // Subscribe for a network update from coordinator
+     ros::Subscriber networkUpdateSubscriber;
 
 
 public slots:

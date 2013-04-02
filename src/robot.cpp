@@ -74,6 +74,13 @@ void Robot::setCoordinator(bool status)
 {
     coordinator = status;
 }
+void Robot::sendNetworkInfo(QStringList info)
+{
+    if(this->outgoingConnected)
+    {
+        this->outgoingclient->sendNetworkInfo(info);
+    }
+}
 void Robot::getClientDisconnected(int type)
 {
     qDebug()<<"Robot "<<this->name<<" client "<<type<<" disconnected"<<"name "<<name;
@@ -135,5 +142,17 @@ void Robot::sendCoordinatorUpdatetoCoordinator(navigationISL::neighborInfo info)
         this->outgoingclient->sendCoordinatorUpdatetoCoordinator(info);
 
 
+
+
+}
+void Robot::receiveNetworkInfoFromCoordinator(QStringList list)
+{
+
+  //  CommunicationManager* manager = (CommunicationManager*)this->parent();
+
+    qDebug()<<"Here i am";
+    QStringList tempList = list;
+
+    emit networkInfo(tempList);
 
 }

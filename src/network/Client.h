@@ -57,6 +57,12 @@ public:
     // Send the coordinator update to the outgoing client
     void sendCoordinatorUpdatetoCoordinator(navigationISL::neighborInfo info);
 
+    // Sends the network information from coordinator to clients
+    void sendNetworkInfo(QStringList info);
+
+    // Sends the network information from coordinator to clients
+    void receiveNetworkInfo();
+
     // Receive the coordinator update from the incoming client
     void receiveCoordinatorUpdateFromClient();
 
@@ -97,9 +103,9 @@ public:
 
         RECV_ROBOT_INFO = 0x11,
 
-        SEND_ROBOT_POSE = 0x12,
+        RECV_COORDINATOR_UPDATE = 0x12,
 
-        RECV_COORDINATOR_UPDATE = 0x13
+        RECV_NETWORK_INFO = 0x13
 	
 	};
 
@@ -144,5 +150,5 @@ private:
 		void acknowledgeReceived(int id);
         void neighborInfo(navigationISL::robotInfo info);
         void coordinatorUpdate(navigationISL::neighborInfo info);
-	
+        void networkInfo(QStringList list);
 };

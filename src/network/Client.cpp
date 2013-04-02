@@ -46,6 +46,7 @@ Client::Client(QTcpSocket* sock, int clientType, QObject* parent):QObject(parent
     // When coordinator update is received notify the parent
     connect(this,SIGNAL(coordinatorUpdate(navigationISL::neighborInfo)),this->parent(),SLOT(receiveCoordinatorUpdate(navigationISL::neighborInfo)));
 
+    connect(this, SIGNAL(networkInfo(QStringList)),this->parent(),SLOT(receiveNetworkInfoFromCoordinator(QStringList)));
     clientSocketError = QAbstractSocket::UnknownSocketError; // initially no error
 
 	speedCounter = 0;
@@ -123,7 +124,7 @@ void Client::receiveData(){
     myRecData = QString::fromAscii(myRecDataBA);
 
     // Split the data (Comma seperated format)
-    QStringList list = myRecData.split(",");
+    QStringList list = myRecData.split(",",QString::SkipEmptyParts);
 
     // Incoming data parts
     qDebug()<<"Number of incoming data parts"<<list.size();
@@ -189,6 +190,9 @@ void Client::handleTask(int task , int dataSize){
         break;
     case RECV_COORDINATOR_UPDATE:
         receiveCoordinatorUpdateFromClient();
+        break;
+    case RECV_NETWORK_INFO:
+        receiveNetworkInfo();
         break;
     default:
         break;
@@ -293,6 +297,7 @@ void Client::setHostName(QString Name){
 
 
 }
+
 void Client::sendRobotInfotoNeighbor(navigationISL::robotInfo info)
 {
     QByteArray data;
@@ -349,7 +354,21 @@ void Client::sendRobotInfotoNeighbor(navigationISL::robotInfo info)
 
     QByteArray dat = makeDataPackage(RECV_ROBOT_INFO,dataSize,data);
 
+    if(this->socket->waitForBytesWritten(500));
+
     sendData(dat);
+
+
+}
+void Client::receiveNetworkInfo()
+{
+    QStringList list = myRecData.split(";",QString::SkipEmptyParts);
+
+    if(list.size() > 0){
+        qDebug()<<list;
+        emit networkInfo(list);
+    }
+
 
 
 }
@@ -407,6 +426,9 @@ void Client::sendCoordinatorUpdatetoCoordinator(navigationISL::neighborInfo info
 
     QByteArray dat = makeDataPackage(RECV_COORDINATOR_UPDATE,dataSize,data);
 
+    if(this->socket->waitForBytesWritten(500));
+
+
     sendData(dat);
 
 }
@@ -427,6 +449,38 @@ void Client::receiveCoordinatorUpdateFromClient()
 
         emit coordinatorUpdate(info);
     }
+
+
+}
+void Client::sendNetworkInfo(QStringList info)
+{
+    QByteArray data;
+
+    qDebug()<<"Network info sent";
+
+   // QString temp = QString::number(info.neighbors.size());
+
+   // data.append(temp);
+
+   // data.append(info.neighbors.size());
+
+    //data.append(";");
+
+    for(int i = 0; i < info.size();i++){
+
+        data.append(info[i]);
+
+        data.append(";");
+
+    }
+
+    int dataSize = data.size();
+
+    QByteArray dat = makeDataPackage(RECV_NETWORK_INFO,dataSize,data);
+
+    if(this->socket->waitForBytesWritten(500));
+
+    sendData(dat);
 
 
 }
