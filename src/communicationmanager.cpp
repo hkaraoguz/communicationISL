@@ -15,9 +15,7 @@ CommunicationManager::CommunicationManager(QObject *parent) :
     {
         qDebug()<<"Initialization failed";
     }
-    if(myrobot->isCoordinator())
-        firstNetworkReceived = true;
-    else
+
         firstNetworkReceived = false;
 
     //  Robot* robot = new Robot(this);
@@ -422,6 +420,17 @@ void CommunicationManager::handleNetworkUpdateFromCoordinator(navigationISL::net
 
     QStringList nbrs = str.split(",");
 
+    if(!firstNetworkReceived)
+    {
+        firstNetworkReceived = true;
+
+        navigationISL::neighborInfo inf;
+
+        inf.name = "start";
+
+        this->rosthread->neighborInfoPublisher.publish(inf);
+    }
+
     //qDebug()<<nbrs;
 
     if(myrobot->isCoordinator())
@@ -520,6 +529,10 @@ bool CommunicationManager::initializeNetwork()
     if(myrobot->isCoordinator())
     {
         this->connectToRobots();
+
+        neighbors.clear();
+
+
     }
     // After 5 seconds start to connect with other robots
     // QTimer::singleShot(5000,this,SLOT(connectToRobots()));
