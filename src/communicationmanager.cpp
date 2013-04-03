@@ -383,8 +383,19 @@ void CommunicationManager::handleCoordinatorUpdate(navigationISL::robotInfo info
 void CommunicationManager::handleNavigationISLInfo(navigationISL::robotInfo msg)
 {
     navigationISL::robotInfo info = msg;
+    info.neighbors.erase(info.neighbors.begin(),info.neighbors.end());
+    info.neighbors.resize(this->neighbors.size());
 
-    // qDebug()<<msg.posX<<" "<<msg.posY;
+    //qDebug()<<"Neighbors size"<<neighbors.size();
+
+   // qDebug()<<"Info size "<<info.neighbors.size();
+
+    for(int i = 0; i < neighbors.size(); i++){
+
+        info.neighbors[i] = neighbors.at(i).toStdString();
+    }
+
+  //   qDebug()<<"Info size "<<info.neighbors.size();
 
     for(int i = 0; i < neighbors.size(); i++){
 
@@ -619,16 +630,19 @@ void CommunicationManager::handleNetworkInfo(QStringList list)
 
     }
     QTextStream stream(&file);
-    QString str;
+    QString strr;
     for(int i = 0; i < neighbors.size(); i++){
-        str.append(neighbors[i]);
+        QString str = neighbors[i];
 
-        str.append(";");
+        str.remove("IRobot");
+
+        strr.append(str);
+        strr.append(";");
 
     }
-    str.truncate(str.size()-1);
+    strr.truncate(strr.size()-1);
 
-    stream<<QDateTime::currentDateTime().toTime_t()<<" "<<Client::RECV_NETWORK_INFO<<" "<<str<<"\n";
+    stream<<QDateTime::currentDateTime().toTime_t()<<" "<<Client::RECV_NETWORK_INFO<<" "<<strr<<"\n";
 
     file.close();
 

@@ -303,7 +303,7 @@ void Client::sendRobotInfotoNeighbor(navigationISL::robotInfo info)
     QByteArray data;
 
     QString temp = QString::number(info.neighbors.size());
-
+    //qDebug()<<info.neighbors.size();
     data.append(temp);
 
    // data.append(info.neighbors.size());
