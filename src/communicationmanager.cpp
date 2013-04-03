@@ -493,7 +493,22 @@ void CommunicationManager::handleNetworkUpdateFromCoordinator(navigationISL::net
                 neighbors.push_back(nbrs.at(id-1));
 
             }
+
+
         }
+        navigationISL::neighborInfo inf;
+
+        inf.name.append("Neighbors");
+
+        for(int m = 0; m < neighbors.size(); m++)
+        {
+            inf.name.append(";");
+            inf.name.append(neighbors.at(m).toStdString());
+
+
+        }
+
+         this->rosthread->neighborInfoPublisher.publish(inf);
         //qDebug()<<neighbors;
         //nbrs.removeAt(id-1);
 
@@ -614,9 +629,24 @@ void CommunicationManager::connectToRobots()
 
 
 }
+// Handle the new network info from coordinator
 void CommunicationManager::handleNetworkInfo(QStringList list)
 {
     this->neighbors = list;
+
+    navigationISL::neighborInfo inf;
+
+    inf.name.append("Neighbors");
+
+    for(int m = 0; m < neighbors.size(); m++)
+    {
+        inf.name.append(";");
+        inf.name.append(neighbors.at(m).toStdString());
+
+
+    }
+
+    this->rosthread->neighborInfoPublisher.publish(inf);
 
     QFile file("../fromCoordinator.txt");
 
