@@ -35,7 +35,7 @@ void RosThread::work(){
      coordinatorUpdateSubscriber = n.subscribe("navigationISL/coordinatorUpdate",5,&CommunicationManager::handleCoordinatorUpdate,this->manager);
 
      // Sends the received neighbor info to the navigationNode
-     neighborInfoPublisher = n.advertise<navigationISL::neighborInfo>("communicationISL/neighborInfo",1);
+     neighborInfoPublisher = n.advertise<navigationISL::neighborInfo>("communicationISL/neighborInfo",3);
   //  this->amclSub = n.subscribe("amcl_pose",2,&RosThread::amclPoseCallback,this);
 
      // Publishes the received coordinator update from a robot to the coordinator node
