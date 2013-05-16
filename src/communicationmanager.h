@@ -7,6 +7,7 @@
 #include <QObject>
 #include <navigationISL/robotInfo.h>
 #include <navigationISL/networkInfo.h>
+#include <navigationISL/helpMessage.h>
 #include <QXmlStreamReader>
 
 class RosThread;
@@ -26,7 +27,10 @@ public:
     // Handle coordinator updates from Navigation ISL
     void handleCoordinatorUpdate(navigationISL::robotInfo info);
 
+    // Handle the coordinator update
     void handleNetworkUpdateFromCoordinator(navigationISL::networkInfo info);
+
+    void handleHotspotHandlerMessageOut(navigationISL::helpMessage msg);
 
     bool readConfigFile(QString filename);
 
@@ -71,6 +75,8 @@ private slots:
     void connectToRobots();
 
     void handleNetworkInfo(QStringList list);
+
+
 };
 
 #endif // COMMUNICATIONMANAGER_H

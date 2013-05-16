@@ -42,13 +42,10 @@ void RosThread::work(){
      coordinatorUpdatePublisher = n.advertise<navigationISL::neighborInfo>("communicationISL/coordinatorUpdate",1);
 
      networkUpdateSubscriber = n.subscribe("coordinatorISL/networkInfo",1,&CommunicationManager::handleNetworkUpdateFromCoordinator,this->manager);
-    /* navigationISL::robotInfo inf;
-     inf.neighbors.resize(1);
-     inf.posX = 2;
-     inf.posY =3;*/
-    // ros::AsyncSpinner spinner(2);
 
-   //  spinner.start();
+     hotspotHandlerMessageInPublisher = n.advertise<navigationISL::helpMessage>("communicationISL/hotspothandlerMessageIn",5);
+
+     hotspotHandlerMessageOutSubscriber = n.subscribe("hotspothandler/messageOut",5,&CommunicationManager::handleHotspotHandlerMessageOut,this->manager);
 
     ros::Rate loop(30);
 

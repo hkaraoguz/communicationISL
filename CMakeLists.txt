@@ -25,7 +25,7 @@ set(LIBRARY_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/lib)
 
 include_directories(./src/network)
 include_directories(./src)
-include_directories(/home/fuerte_workspace/sandbox)
+include_directories(/home/irobot3/fuerte_workspace/sandbox)
 
 SET(qt_HEADERS src/network/Client.h src/network/tcpComm.h src/network/tcpServer.h src/rosThread.h  src/communicationmanager.h src/robot.h)
 

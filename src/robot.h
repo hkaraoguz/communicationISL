@@ -20,6 +20,8 @@ public:
 
     void sendNetworkInfo(QStringList info);
 
+    void sendOutgoingHotspotMessage(navigationISL::helpMessage msg);
+
     navigationISL::robotInfo getRobotInfo();
 
     void setName(QString nam);
@@ -80,6 +82,7 @@ public slots:
 
     void receiveNetworkInfoFromCoordinator(QStringList list);
 
+    void receiveHotspotMessage(QStringList list);
     
 };
 

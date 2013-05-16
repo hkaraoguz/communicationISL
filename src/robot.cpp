@@ -229,3 +229,27 @@ void Robot::receiveNetworkInfoFromCoordinator(QStringList list)
     emit networkInfo(tempList);
 
 }
+void Robot::sendOutgoingHotspotMessage(navigationISL::helpMessage msg)
+{
+    if(this->isOutgoingConnected())
+        this->outgoingclient->sendHotspotOutgoingMessage(msg);
+
+}
+void Robot::receiveHotspotMessage(QStringList list)
+{
+        navigationISL::helpMessage msg;
+
+        QString name = this->getName();
+
+        name.remove("IRobot");
+
+        int id = name.toInt();
+
+        msg.robotid = id;
+
+        msg.messageid = list.at(0).toInt();
+
+        CommunicationManager* manager = (CommunicationManager*)this->parent();
+
+        manager->rosthread->hotspotHandlerMessageInPublisher.publish(msg);
+}

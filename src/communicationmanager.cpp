@@ -692,4 +692,26 @@ void CommunicationManager::handleNetworkInfo(QStringList list)
 
     qDebug()<<myrobot->getName()<<" neighbors "<<this->neighbors;
 }
+void CommunicationManager::handleHotspotHandlerMessageOut(navigationISL::helpMessage msg)
+{
+
+    navigationISL::helpMessage ms = msg;
+
+    QString str = "IRobot";
+
+    str.append(QString::number(msg.robotid));
+
+    for(int i = 0; i < robots.size(); i++ )
+    {
+
+        if(str == robots.at(i)->getName())
+        {
+
+            robots.at(i)->sendOutgoingHotspotMessage(ms);
+
+        }
+    }
+
+
+}
 

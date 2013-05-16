@@ -4,11 +4,21 @@
 #pragma once
 #include <QtNetwork>
 #include <QtCore/QByteArray>
+//#include <hotspothandlerISL/src/rosThread.h>
 #include <navigationISL/robotInfo.h>
 #include "navigationISL/neighborInfo.h"
+#include <navigationISL/helpMessage.h>
 #define INCOMING_CLIENT 0
 #define OUTGOING_CLIENT 1
+#define COMMA_OFFSET 3
 class tcpComm;
+enum HotspotMessageType
+{
+    HMT_NONE = -1,
+    HMT_HELP_REQUEST = 0,
+    HMT_HELPING = 1,
+    HMT_NOT_HELPING = 2
+};
 class Client : public QObject
 {
 		Q_OBJECT
@@ -69,6 +79,11 @@ public:
     // Receive the robot info from the incoming client
     void receiveRobotInfoFromNeighbor();
 
+    // Send incoming hotspot related message to outgoing client
+    void sendHotspotOutgoingMessage(navigationISL::helpMessage msg);
+
+    void receiveHotspotMessage();
+
 	void receiveSPCounter(bool respond);
 
 	void sendSPCounter();
@@ -105,7 +120,11 @@ public:
 
         RECV_COORDINATOR_UPDATE = 0x12,
 
-        RECV_NETWORK_INFO = 0x13
+        RECV_NETWORK_INFO = 0x13,
+
+        RECV_HELP_REQUEST = 0x14,
+
+        SEND_HELP_RESPONSE = 0x15
 	
 	};
 
@@ -151,4 +170,5 @@ private:
         void neighborInfo(navigationISL::robotInfo info);
         void coordinatorUpdate(navigationISL::neighborInfo info);
         void networkInfo(QStringList list);
+        void incomingHotspotMessage(QStringList list);
 };

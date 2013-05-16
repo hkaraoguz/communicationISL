@@ -143,6 +143,20 @@ void Client::receiveData(){
             // Read the task
             int task = list.at(1).toInt();
 
+            int dataSize = list.at(2).toInt();
+
+            int meaningfulSize = dataSize + list.at(1).size() + list.at(0).size() + list.at(2).size() + COMMA_OFFSET;
+
+            if(myRecData.size() > meaningfulSize)
+            {
+                myRecData.remove(meaningfulSize,myRecData.size() - meaningfulSize);
+
+                list.clear();
+
+                list = myRecData.split(",");
+            }
+
+
             // Clear the buffers
             myRecData.clear();
             myRecDataBA.clear();
@@ -178,7 +192,6 @@ void Client::handleTask(int task , int dataSize){
     case RECV_HOST_NAME:
         receiveHostName();
         break;
-
     case RECV_IMAGE:
         receiveImage();
         break;
@@ -193,6 +206,12 @@ void Client::handleTask(int task , int dataSize){
         break;
     case RECV_NETWORK_INFO:
         receiveNetworkInfo();
+        break;
+    case RECV_HELP_REQUEST:
+        receiveHotspotMessage();
+        break;
+    case SEND_HELP_RESPONSE:
+        receiveHotspotMessage();
         break;
     default:
         break;
@@ -369,8 +388,12 @@ void Client::receiveNetworkInfo()
         emit networkInfo(list);
     }
 
+}
+void Client::receiveHotspotMessage()
+{
+    QStringList list = myRecData.split(";",QString::SkipEmptyParts);
 
-
+    emit incomingHotspotMessage(list);
 }
 void Client::receiveRobotInfoFromNeighbor()
 {
@@ -676,4 +699,27 @@ void Client::sendAcknowledge(bool status){
 void Client::receiveAcknowledge(){
 
 //	emit(acknowledgeReceived(id));
+}
+void Client::sendHotspotOutgoingMessage(navigationISL::helpMessage msg)
+{
+    QByteArray data;
+
+    QString temp = QString::number(msg.messageid);
+
+    data.append(temp);
+
+    int dataSize = data.size();
+
+    QByteArray dat;
+
+    if(msg.messageid == HMT_HELP_REQUEST )
+        dat = makeDataPackage(RECV_HELP_REQUEST,dataSize,data);
+    else
+        dat = makeDataPackage(SEND_HELP_RESPONSE,dataSize,data);
+
+
+    this->socket->waitForBytesWritten(500);
+
+    sendData(dat);
+
 }

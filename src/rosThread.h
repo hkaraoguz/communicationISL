@@ -4,6 +4,7 @@
 #include <ros/ros.h>
 #include "navigationISL/robotInfo.h"
 #include <navigationISL/networkInfo.h>
+#include <navigationISL/helpMessage.h>
 #include "communicationmanager.h"
 #include <QTimer>
 
@@ -44,11 +45,17 @@ private:
      // Publish the received coordinator Update to the coordinator
      ros::Publisher coordinatorUpdatePublisher;
 
+     ros::Publisher hotspotHandlerMessageInPublisher;
+
      // Subscribe for coordinatorUpdate from Navigation
      ros::Subscriber coordinatorUpdateSubscriber;
 
      // Subscribe for a network update from coordinator
      ros::Subscriber networkUpdateSubscriber;
+
+     ros::Subscriber hotspotHandlerMessageOutSubscriber;
+
+
 
 
 public slots:
