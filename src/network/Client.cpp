@@ -36,6 +36,8 @@ Client::Client(QTcpSocket* sock, int clientType, QObject* parent):QObject(parent
 
 	connect(socket,SIGNAL(readyRead()),this,SLOT(receiveData()));
 
+	connect(this,SIGNAL(incomingHotspotMessage(QStringList)),this->parent(),SLOT(receiveHotspotMessage(QStringList)));
+
 	connect(socket, SIGNAL(error(QAbstractSocket::SocketError)), this, SLOT(displaySocketError(QAbstractSocket::SocketError)));
 
     //connect(this,SIGNAL(imageReceived(QImage)), TcpComm, SLOT(getClientImageReceived(QImage)));
@@ -392,6 +394,8 @@ void Client::receiveNetworkInfo()
 void Client::receiveHotspotMessage()
 {
     QStringList list = myRecData.split(";",QString::SkipEmptyParts);
+
+    qDebug()<<list;    
 
     emit incomingHotspotMessage(list);
 }
