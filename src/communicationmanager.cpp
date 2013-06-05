@@ -701,6 +701,8 @@ void CommunicationManager::handleHotspotHandlerMessageOut(navigationISL::helpMes
 
     str.append(QString::number(msg.robotid));
 
+    qDebug()<<"The outgoing hotspot message robot name "<<str;
+
     for(int i = 0; i < robots.size(); i++ )
     {
 

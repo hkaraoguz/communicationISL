@@ -45,7 +45,7 @@ void RosThread::work(){
 
      hotspotHandlerMessageInPublisher = n.advertise<navigationISL::helpMessage>("communicationISL/hotspothandlerMessageIn",5);
 
-     hotspotHandlerMessageOutSubscriber = n.subscribe("hotspothandler/messageOut",5,&CommunicationManager::handleHotspotHandlerMessageOut,this->manager);
+     hotspotHandlerMessageOutSubscriber = n.subscribe("hotspothandlerISL/outMessage",5,&CommunicationManager::handleHotspotHandlerMessageOut,this->manager);
 
     ros::Rate loop(30);
 
