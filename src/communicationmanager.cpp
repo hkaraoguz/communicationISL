@@ -190,7 +190,7 @@ void CommunicationManager::connectToHost(QString hostAddress, quint16 port)
 
     cl->socket->connectToHost(hostAddress,port);
 
-    if(cl->socket->waitForConnected(1000)){
+    if(cl->socket->waitForConnected(300)){
 
         for(int i = 0; i < robots.size() ; i++){
 
@@ -223,7 +223,7 @@ void CommunicationManager::connectToHost(QString hostAddress, quint16 port)
     else
     {
 
-        qDebug()<<"Error";
+        qDebug()<<"Error timeout";
 
         for(int i = 0; i < robots.size() ; i++){
 
