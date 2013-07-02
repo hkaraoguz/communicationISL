@@ -190,7 +190,7 @@ void CommunicationManager::connectToHost(QString hostAddress, quint16 port)
 
     cl->socket->connectToHost(hostAddress,port);
 
-    if(cl->socket->waitForConnected(300)){
+    if(cl->socket->waitForConnected(5000)){
 
         for(int i = 0; i < robots.size() ; i++){
 
