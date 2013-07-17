@@ -68,7 +68,10 @@ void Robot::sendRobotInfo(navigationISL::robotInfo info)
     {
         this->outgoingclient->sendRobotInfotoNeighbor(info);
 
-        QFile file("../toRobot.txt");
+        QString fileName = QDir::homePath();
+        fileName.append("/fuerte_workspace/sandbox/toRobot.txt");
+
+        QFile file(fileName);
 
         if(!file.exists())
         {
@@ -146,7 +149,10 @@ void Robot::receiveRobotInfo(navigationISL::robotInfo info)
 
     manager->rosthread->neighborInfoPublisher.publish(ninfo);
 
-    QFile file("../fromRobot.txt");
+    QString fileName = QDir::homePath();
+    fileName.append("/fuerte_workspace/sandbox/fromRobot.txt");
+
+    QFile file(fileName);
 
     if(!file.exists())
     {
@@ -185,7 +191,10 @@ void Robot::receiveCoordinatorUpdate(navigationISL::neighborInfo info)
 
     qDebug()<<"Received a coordinator update";
 
-    QFile file("../CoordinatorReceivedUpdate.txt");
+    QString fileName = QDir::homePath();
+    fileName.append("/fuerte_workspace/sandbox/CoordinatorReceivedUpdate.txt");
+
+    QFile file(fileName);
 
     if(!file.exists())
     {

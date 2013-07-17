@@ -336,7 +336,10 @@ void CommunicationManager::handleCoordinatorUpdate(navigationISL::robotInfo info
     inf.posX = info.posX;
     inf.posY = info.posY;
 
-    QFile file("../toCoordinator.txt");
+    QString fileName = QDir::homePath();
+    fileName.append("/fuerte_workspace/sandbox/toCoordinator.txt");
+
+    QFile file(fileName);
 
     if(!file.exists())
     {
@@ -512,8 +515,10 @@ void CommunicationManager::handleNetworkUpdateFromCoordinator(navigationISL::net
         //qDebug()<<neighbors;
         //nbrs.removeAt(id-1);
 
+        QString fileName = QDir::homePath();
+        fileName.append("/fuerte_workspace/sandbox/toRobotsNetworkInfo.txt");
 
-        QFile file("../toRobotsNetworkInfo.txt");
+        QFile file(fileName);
 
         if(!file.exists())
         {
@@ -648,7 +653,10 @@ void CommunicationManager::handleNetworkInfo(QStringList list)
 
     this->rosthread->neighborInfoPublisher.publish(inf);
 
-    QFile file("../fromCoordinator.txt");
+    QString fileName = QDir::homePath();
+    fileName.append("/fuerte_workspace/sandbox/fromCoordinator.txt");
+
+    QFile file(fileName);
 
     if(!file.exists())
     {
